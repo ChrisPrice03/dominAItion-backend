@@ -12,7 +12,7 @@ class OrchestrationAgent(Agent):
         A simple test method that returns a response.
         """
         #orchestration_agent = Agent(
-        #   system_prompt=ORCHESTRATION_AGENT_PROMPT,
+        #   system_prompt=ORCHESTRATION_PROMPT,
         #   tools=[
         #       roll_die,
         #       detect_cheat,
@@ -22,3 +22,14 @@ class OrchestrationAgent(Agent):
         #response = orchestration_agent(input_data)
 
         return f"Test method received: {input_data}"
+
+    orchestration_agent = Agent(
+              system_prompt=ORCHESTRATION_PROMPT,
+              tools=[
+                  roll_die,
+                  detect_cheat,
+                  ],
+              )
+
+    response = orchestration_agent("I would like to try to develop a new superpower that allows me to fly.")
+    print(response)
