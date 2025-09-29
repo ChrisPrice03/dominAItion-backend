@@ -1,7 +1,7 @@
 from strands import Agent, tool
-from system_prompts import ORCHESTRATION_AGENT_PROMPT
+from system_prompts.orchestration_prompt import ORCHESTRATION_PROMPT
 from tools.dice_tool import roll_die
-from agents.anticheat_agent import detect_cheat
+from anticheat_agent import detect_cheat
 
 class OrchestrationAgent(Agent):
     def __init__(self):

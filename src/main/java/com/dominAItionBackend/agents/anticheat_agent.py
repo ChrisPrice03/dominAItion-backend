@@ -1,5 +1,5 @@
 from strands import Agent, tool
-from system_prompts import ANTICHEAT_PROMPT
+from system_prompts.anticheat_prompt import ANTICHEAT_PROMPT
 
 @tool
 def detect_cheat(action: str) -> str:
@@ -19,5 +19,5 @@ def detect_cheat(action: str) -> str:
 
             response = anticheat_agent(action)
             return str(response)
-        except Exception as e:
+    except Exception as e:
             return f"Error in anticheat_agent: {str(e)}"
