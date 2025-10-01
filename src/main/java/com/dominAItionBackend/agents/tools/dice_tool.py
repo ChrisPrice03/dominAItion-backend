@@ -14,4 +14,6 @@ def roll_die(sides: int) -> int:
     """
     if sides < 1:
         return ValueError("A die must have at least one side.")
-    return random.randint(1, sides)
+    result = random.randint(1, sides)
+    print(f"Rolled a {sides}-sided die: {result}")
+    return result
