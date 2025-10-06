@@ -1,6 +1,7 @@
 package com.dominAItionBackend.controllers;
 
 import com.dominAItionBackend.service.AIService;
+import com.dominAItionBackend.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,11 +16,13 @@ public class AIController {
     @Autowired
     private AIService aiService;
 
+    @Autowired
+    private GameService gameService;
+
     //main story endpoint (/api/ai/story)
     @PostMapping("/story")
     public String promptRespond(@RequestBody Map<String, String> requestBody) {
         String request = requestBody.get("request");
-        //return aiService.storyPromptRespond(request);
-        return aiService.callOrchestrationAgent(request);
+        return gameService.handleStoryRequest(request);
     }
 }
