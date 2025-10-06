@@ -62,7 +62,7 @@ public class User {
         this.online = false;
     }
 
-    // ✅ Constructor for quick creation
+    // Constructor for quick creation
     public User(String username, String email, String password) {
         this();
         this.username = username;
