@@ -14,9 +14,7 @@ def roll_die(sides: int) -> int:
     """
     if sides < 1:
         return ValueError("A die must have at least one side.")
-<<<<<<< Updated upstream
-    return random.randint(1, sides)
-=======
+
     result = random.randint(1, sides)
     print(f"Rolled a {sides}-sided die: {result}")
     return result
@@ -28,4 +26,4 @@ if __name__ == "__main__":
     print(result)
     result = roll_die(0)
     print(result)
->>>>>>> Stashed changes
+

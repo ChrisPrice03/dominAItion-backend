@@ -1,5 +1,7 @@
 from strands import Agent, tool
+from strands.models.openai import OpenAIModel
 from system_prompts.anticheat_prompt import ANTICHEAT_PROMPT
+from api_key import API_KEY
 
 @tool
 def detect_cheat(action: str) -> str:
@@ -13,28 +15,26 @@ def detect_cheat(action: str) -> str:
         str: plaintext of the agent's conclusion on whether the action is cheating or not.
     """
     try:
-<<<<<<< Updated upstream
-=======
-            # Temporarily using openai key here, will switch bedrock model later
-            model = OpenAIModel(
-                    client_args={
-                        "api_key": API_KEY,
-                    },
-                    model_id="gpt-5-nano",
-                    params={
-                        "max_completion_tokens": 3000,
-                    }
-                )
+        # Temporarily using openai key here, will switch bedrock model later
+        model = OpenAIModel(
+            client_args={
+                "api_key": API_KEY,
+            },
+            model_id="gpt-5-nano",
+            params={
+                "max_completion_tokens": 2000,
+            }
+        )
 
->>>>>>> Stashed changes
-            anticheat_agent = Agent(
-                system_prompt=ANTICHEAT_PROMPT,
-            )
+        anticheat_agent = Agent(
+            model=model,
+            system_prompt=ANTICHEAT_PROMPT,
+        )
 
-            response = anticheat_agent(action)
-            return str(response)
+        response = anticheat_agent(action)
+        return str(response)
     except Exception as e:
-            return f"Error in anticheat_agent: {str(e)}"
+        return f"Error in anticheat_agent: {str(e)}"
 
 
 if __name__ == "__main__":
