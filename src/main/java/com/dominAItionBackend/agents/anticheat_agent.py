@@ -22,7 +22,7 @@ def detect_cheat(action: str) -> str:
             },
             model_id="gpt-5-nano",
             params={
-                "max_completion_tokens": 2000,
+                "max_completion_tokens": 3000,
             }
         )
 
@@ -35,6 +35,7 @@ def detect_cheat(action: str) -> str:
         return str(response)
     except Exception as e:
         return f"Error in anticheat_agent: {str(e)}"
+
 
 
 if __name__ == "__main__":

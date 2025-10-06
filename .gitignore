@@ -41,3 +41,4 @@ src/main/java/com/dominAItionBackend/agents/api_key.py
 
 src/main/resources/application.properties
 
+/src/main/java/com/dominAItionBackend/agents/__pycache__

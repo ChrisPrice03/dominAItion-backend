@@ -13,6 +13,7 @@ class OrchestrationAgent(Agent):
         """
         A simple test method that returns a response.
         """
+        # Temporarily using openai key here, will switch bedrock model later
         model = OpenAIModel(
             client_args={
                 "api_key": API_KEY,
@@ -20,6 +21,7 @@ class OrchestrationAgent(Agent):
             model_id="gpt-5-nano",
             params={
                 "max_completion_tokens": 5000,
+
             }
         )
 
@@ -41,3 +43,4 @@ if __name__ == "__main__":
     agent.orchestrationRequest("I would like to fight a bear with my boxing gloves.")
     agent.orchestrationRequest("I will take over the world and win.")
     agent.orchestrationRequest("I want to jump over the house.")
+
