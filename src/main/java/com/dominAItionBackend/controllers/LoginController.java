@@ -16,5 +16,7 @@ public class LoginController {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         System.out.println(email + " " + password);
+
+        return "Login request received for " + email;
     }
 }
