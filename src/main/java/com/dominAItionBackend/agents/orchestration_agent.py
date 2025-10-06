@@ -11,6 +11,7 @@ class OrchestrationAgent(Agent):
         """
         A simple test method that returns a response.
         """
+<<<<<<< Updated upstream
         #orchestration_agent = Agent(
         #   system_prompt=ORCHESTRATION_PROMPT,
         #   tools=[
@@ -18,6 +19,18 @@ class OrchestrationAgent(Agent):
         #       detect_cheat,
         #       ],
         #   )
+=======
+        # Temporarily using openai key here, will switch bedrock model later
+        model = OpenAIModel(
+            client_args={
+                "api_key": API_KEY,
+            },
+            model_id="gpt-5-nano",
+            params={
+                "max_completion_tokens": 3000,
+            }
+        )
+>>>>>>> Stashed changes
 
         #response = orchestration_agent(input_data)
 
@@ -31,5 +44,13 @@ class OrchestrationAgent(Agent):
                   ],
               )
 
+<<<<<<< Updated upstream
     response = orchestration_agent("I would like to try to develop a new superpower that allows me to fly.")
     print(response)
+=======
+if __name__ == "__main__":
+    agent = OrchestrationAgent()
+    agent.orchestrationRequest("I would like to fight a bear with my boxing gloves.")
+    agent.orchestrationRequest("I will take over the world and win.")
+    agent.orchestrationRequest("I want to jump over the house.")
+>>>>>>> Stashed changes
