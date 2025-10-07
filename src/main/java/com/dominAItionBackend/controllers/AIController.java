@@ -22,4 +22,18 @@ public class AIController {
         //return aiService.storyPromptRespond(request);
         return aiService.callOrchestrationAgent(request);
     }
+
+    //World Defining Endpoint
+    @PostMapping("/world")
+    public String worldDefinition(@RequestBody Map<String, String> requestBody) {
+        String request = requestBody.get("request");
+        return aiService.callWorldDefiningAgent(request);
+    }
+
+    //Character Defining Endpoint
+    @PostMapping("/character")
+    public String characterDefinition(@RequestBody Map<String, String> requestBody) {
+        String request = requestBody.get("request");
+        return aiService.callCharacterDefiningAgent(request);
+    }
 }
