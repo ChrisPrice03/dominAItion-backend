@@ -3,6 +3,7 @@ from strands.models.openai import OpenAIModel
 from system_prompts.orchestration_prompt import ORCHESTRATION_PROMPT
 from tools.dice_tool import roll_die
 from anticheat_agent import detect_cheat
+from intent_agent import determine_intent
 from api_key import API_KEY
 
 class OrchestrationAgent(Agent):
@@ -31,6 +32,7 @@ class OrchestrationAgent(Agent):
             tools=[
                 roll_die,
                 detect_cheat,
+                determine_intent,
             ],
         )
 
@@ -42,5 +44,5 @@ if __name__ == "__main__":
     agent = OrchestrationAgent()
     agent.orchestrationRequest("I would like to fight a bear with my boxing gloves.")
     agent.orchestrationRequest("I will take over the world and win.")
-    agent.orchestrationRequest("I want to jump over the house.")
+    agent.orchestrationRequest("I want to jump over the house, then talk to Jimmy.")
 
