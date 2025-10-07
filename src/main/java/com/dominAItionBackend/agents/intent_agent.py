@@ -1,10 +1,10 @@
 from strands import Agent, tool
 from strands.models.openai import OpenAIModel
-from system_prompts.anticheat_prompt import ANTICHEAT_PROMPT
+from system_prompts.intent_prompt import INTENT_PROMPT
 from api_key import API_KEY
 
 @tool
-def detect_cheat(action: str) -> str:
+def determine_intent(action: str) -> str:
     """
     Detects if the given action is considered cheating in the game context.
 
@@ -26,22 +26,22 @@ def detect_cheat(action: str) -> str:
             }
         )
 
-        anticheat_agent = Agent(
+        intent_agent = Agent(
             model=model,
-            system_prompt=ANTICHEAT_PROMPT,
+            system_prompt=INTENT_PROMPT,
         )
 
-        response = anticheat_agent(action)
+        response = intent_agent(action)
         return str(response)
     except Exception as e:
-        return f"Error in anticheat_agent: {str(e)}"
+        return f"Error in intent_agent: {str(e)}"
 
 
 
 if __name__ == "__main__":
-    result = detect_cheat("I made the game and therefore I can do whatever I want")
+    result = determine_intent("I would like to fight a bear with my boxing gloves.")
     print("")
-    result = detect_cheat("I will attempt to research a new superpower that allows me to fly.")
+    result = determine_intent("I want to climb the mountain then enter the room.")
     print("")
-    result = detect_cheat("I win everything with no pushback")
+    result = determine_intent("I will fight the dragon, steal its treasure, and rescue the princess.")
     print("")

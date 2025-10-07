@@ -56,10 +56,6 @@ public class AIService {
         }
     }
 
-    public String storyPromptRespond(String request) {
-        return "This is a response to the story prompt: " + request;
-    }
-
     public String callOrchestrationAgent(String input) {
         String url = "http://localhost:5000/orchestrate";
         var request = new java.util.HashMap<String, String>();
