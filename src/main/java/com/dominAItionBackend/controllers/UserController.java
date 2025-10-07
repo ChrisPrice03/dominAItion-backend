@@ -9,10 +9,20 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.UUID;
+import java.util.Date;
+import com.dominAItionBackend.models.EmailVerificationToken;
+import com.dominAItionBackend.repository.EmailVerificationTokenRepository;
+import com.dominAItionBackend.service.EmailService;
+
+import com.dominAItionBackend.models.PasswordResetToken;
+import com.dominAItionBackend.repository.PasswordResetTokenRepository;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -24,6 +34,15 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private EmailVerificationTokenRepository tokenRepository;
+    @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
@@ -300,6 +319,145 @@ public class UserController {
     }
 
 
+    
+    @PutMapping("/updateProfile/{email}")
+    public ResponseEntity<?> updateProfile(
+            @PathVariable String email,
+            @RequestBody Map<String, String> body) {
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        String newUsername = body.get("username");
+        String newBio = body.get("bio");
+
+        if (newUsername == null || newUsername.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Username cannot be empty");
+        }
+
+        // Prevent duplicate usernames
+        List<User> allUsers = userRepository.findAll();
+        boolean duplicate = allUsers.stream()
+            .anyMatch(u -> u.getUsername().equalsIgnoreCase(newUsername) && !u.getEmail().equals(email));
+
+        if (duplicate) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already taken");
+        }
+
+        user.setUsername(newUsername);
+        user.setBio(newBio);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/verify/{email}")
+    public ResponseEntity<String> sendVerificationEmail(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        if (user.isEmailVerified()) {
+            return ResponseEntity.ok("Already verified");
+        }
+
+        String token = UUID.randomUUID().toString();
+        Date expiry = new Date(System.currentTimeMillis() + 15 * 60 * 1000); // 15 mins
+
+        EmailVerificationToken evToken = new EmailVerificationToken(user.getId(), token, expiry);
+        tokenRepository.save(evToken);
+
+        String link = "http://localhost:8080/api/users/verify/confirm?token=" + token;
+
+        try {
+            emailService.sendVerificationEmail(user.getEmail(), link);
+            return ResponseEntity.ok("Verification email sent to " + user.getEmail());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error sending email: " + e.getMessage());
+        }
+    }
+    @GetMapping("/verify/confirm")
+    public ResponseEntity<String> confirmVerification(@RequestParam("token") String token) {
+        Optional<EmailVerificationToken> tokenOpt = tokenRepository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
+        }
+
+        EmailVerificationToken evToken = tokenOpt.get();
+        User user = userRepository.findById(evToken.getUserId()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
+        tokenRepository.delete(evToken);
+
+        return ResponseEntity.ok("Email verified successfully!");
+    }
+
+    @PutMapping("/forgotPassword/{email}")
+    public ResponseEntity<?> sendPasswordResetEmail(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        // Create token that expires in 15 minutes
+        String token = UUID.randomUUID().toString();
+        Date expiry = new Date(System.currentTimeMillis() + 15 * 60 * 1000);
+
+        PasswordResetToken resetToken = new PasswordResetToken(user.getId(), token, expiry);
+        passwordResetTokenRepository.save(resetToken);
+
+        String link = "http://localhost:3000/reset?token=" + token;
+
+        try {
+            emailService.sendPasswordResetEmail(user.getEmail(), link);
+            return ResponseEntity.ok("Password reset email sent to " + user.getEmail());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to send reset email: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestBody Map<String, String> body) {
+        String newPassword = body.get("newPassword");
+
+        var tokenOpt = passwordResetTokenRepository.findByToken(token);
+        if (tokenOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
+        }
+
+        PasswordResetToken resetToken = tokenOpt.get();
+        if (resetToken.isExpired()) {
+            passwordResetTokenRepository.delete(resetToken);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expired");
+        }
+
+        User user = userRepository.findById(resetToken.getUserId()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        System.out.println("⚙️ Resetting password for user: " + user.getEmail());
+        System.out.println("🆕 New raw password (debug): " + newPassword);
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
+        passwordResetTokenRepository.delete(resetToken);
+
+        emailService.sendPasswordChangeConfirmation(user.getEmail());
+
+        return ResponseEntity.ok("Password successfully reset.");
+    }
+
     @PutMapping("/updatePassword/{email}")
     public ResponseEntity<User> updatePassword(@PathVariable String email, @RequestBody String newPassword) {
         User user = userRepository.findByEmail(email);
@@ -307,11 +465,14 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        // hash the password before saving
-        String hashed = passwordEncoder.encode(newPassword);
-        user.setPassword(hashed);
+        user.setPassword(newPassword);
         userRepository.save(user);
+
+        System.out.println("✅ New password stored in MongoDB for " + email);
 
         return ResponseEntity.ok(user);
     }
+
+
+
 }

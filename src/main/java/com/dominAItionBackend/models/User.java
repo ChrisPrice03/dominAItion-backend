@@ -22,7 +22,8 @@ public class User {
     private int losses;
     private int gamesPlayed;
 
-    // stored in MongoDB as ISODate
+    private boolean emailVerified;
+
     private Date time;
 
     private List<String> friendIds;
@@ -60,6 +61,7 @@ public class User {
         this.human = false;
         this.isPublic = true;
         this.online = false;
+        this.emailVerified = false;
     }
 
     // Constructor for quick creation
@@ -68,6 +70,7 @@ public class User {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.emailVerified = false;
     }
 
     // --- Getters and Setters ---
@@ -97,6 +100,9 @@ public class User {
 
     public int getGamesPlayed() { return gamesPlayed; }
     public void setGamesPlayed(int gamesPlayed) { this.gamesPlayed = gamesPlayed; }
+
+    public boolean isEmailVerified() { return emailVerified; }       
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
 
     public Date getTime() { return time; }
     public void setTime(Date time) { this.time = time; }
