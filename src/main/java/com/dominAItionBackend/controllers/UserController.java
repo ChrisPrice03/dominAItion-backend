@@ -260,6 +260,33 @@ public class UserController {
 
         return ResponseEntity.ok("Friend request canceled successfully!");
     }
+    @GetMapping("/friends/{email}")
+    public ResponseEntity<?> getFriendsByEmail(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("User not found");
+        }
+
+        // If they have no friends, return an empty list
+        if (user.getFriendIds() == null || user.getFriendIds().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        // Find each friend by ID (filter out missing ones)
+        List<Map<String, String>> friendList = user.getFriendIds().stream()
+                .map(friendId -> userRepository.findById(friendId).orElse(null))
+                .filter(f -> f != null)
+                .map(f -> Map.of(
+                        "id", f.getId(),
+                        "email", f.getEmail(),
+                        "name", f.getUsername()))
+                .toList();
+
+        return ResponseEntity.ok(friendList);
+    }
+
+
     // Block a user (remove from friends and prevent future requests)
     @PutMapping("/blockUser/{email}/{blockedId}")
     public ResponseEntity<?> blockUser(
