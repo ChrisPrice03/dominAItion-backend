@@ -37,3 +37,9 @@ class WorldDefiningAgent(Agent):
                 return str(response)
         except Exception as e:
                 return f"Error in world_defining_agent: {str(e)}"
+
+if __name__ == "__main__":
+    agent = WorldDefiningAgent()
+    agent.define_world("I would like a desert wasteland")
+    agent.define_world("I would like a vast ocean world")
+    agent.define_world("I would like an alien planet")
