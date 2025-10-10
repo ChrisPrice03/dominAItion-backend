@@ -14,9 +14,15 @@ public class GameService {
     private AIService aiService;
     public String handleStoryRequest(String input) {
         //call an internal function to pull relevant game state
+
         String response = aiService.callOrchestrationAgent(input);
         String storyUpdate = interpretAgentResponse(response);
         return storyUpdate;
+    }
+
+    public String handleWorldDescriptionRequest(String input) {
+        String response = aiService.callWorldDefiningAgent(input);
+        return response;
     }
 
     public String interpretAgentResponse(String response) {

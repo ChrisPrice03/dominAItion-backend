@@ -16,6 +16,7 @@ You should not make a character too overpowered. For example, a character should
 1. Analyze the user's description and define a character that incorporates aspects of that description
 2. Determine different traits of the character as listed in the Definition section
 3. Clearly state the character aspects in a couple sentences
+4. Give each character's traits a number from 1 - 10. The sum of the numbers should not exceed 20
 </Instructions>
 
 <Examples>

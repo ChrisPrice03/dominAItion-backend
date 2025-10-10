@@ -1,10 +1,12 @@
 from strands import Agent, tool
 from strands.models.openai import OpenAIModel
 from system_prompts.orchestration_prompt import ORCHESTRATION_PROMPT
-from tools.dice_tool import roll_die
+#from agents.tools.dice_tool import roll_die
 from anticheat_agent import detect_cheat
 from intent_agent import determine_intent
 from api_key import API_KEY
+from dice_tool import roll_die
+
 
 class OrchestrationAgent(Agent):
     def __init__(self):

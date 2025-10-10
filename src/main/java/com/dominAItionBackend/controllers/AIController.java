@@ -26,7 +26,7 @@ public class AIController {
         return gameService.handleStoryRequest(request);
     }
 
-    //World Defining Endpoint
+    //World Defining Endpoint (/api/ai/world)
     @PostMapping("/world")
     public String worldDefinition(@RequestBody Map<String, String> requestBody) {
         String request = requestBody.get("request");
