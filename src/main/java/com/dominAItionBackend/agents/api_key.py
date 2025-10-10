@@ -1,1 +1,1 @@
-API_KEY="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"
+API_KEY="your_openai_api_key_here"
