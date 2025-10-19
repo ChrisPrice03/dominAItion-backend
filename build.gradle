@@ -19,6 +19,23 @@ repositories {
 }
 
 dependencies {
+     // Core Spring Boot web support (for REST controllers)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // WebSocket + STOMP messaging support
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // MongoDB (if you use @Document, @Id, etc.)
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // JSON support (usually included automatically)
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // Optional: validation, if you use @Valid
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // For testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'org.springframework.boot:spring-boot-starter-security'  
