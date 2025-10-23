@@ -14,7 +14,8 @@ You should only output a JSON object where each key represents a territory name 
 <Instructions>
 1. Read the user’s world description carefully.
 2. Generate a list of at least 20 uniquely named territories that fit within that world.
-3. If this map represents a real world place, be sure to include all major regions or divisions within that place (ie. US would get all 50 states). 
+3. If this map represents a real world place, be sure to include all major regions or divisions within that place (ie. US would get all 50 states).
+   -- If it is a real place, this should be placed seen on political maps. 
 4. Assign each territory a point value (integer between 2 and 5) based on the world’s characteristics.
 5. Return ONLY a JSON object in the following format:
    {

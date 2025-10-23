@@ -1,10 +1,14 @@
 package com.dominAItionBackend.service;
 
+import com.dominAItionBackend.models.Game;
+import com.dominAItionBackend.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
 
 @Service
 public class GameService {
@@ -12,6 +16,12 @@ public class GameService {
 
     @Autowired
     private AIService aiService;
+
+    @Autowired
+    private WorldService worldService;
+
+    @Autowired
+    private GameRepository gameRepository;
     public String handleStoryRequest(String input) {
         //call an internal function to pull relevant game state
         String response = aiService.callOrchestrationAgent(input);
@@ -34,5 +44,16 @@ public class GameService {
             e.printStackTrace();
             return "Error parsing AI response";
         }
+    }
+
+    public String createGame(String worldId, int winningPoints) {
+        Game newGame = new Game(worldId, winningPoints);
+
+        //generate territories for game
+        List<String> territories = worldService.generateTerritories(worldId);
+        newGame.setTerritoryIds(territories);
+
+        Game savedGame = gameRepository.save(newGame);
+        return savedGame.getId();
     }
 }
