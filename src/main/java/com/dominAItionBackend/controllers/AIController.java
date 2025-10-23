@@ -2,6 +2,7 @@ package com.dominAItionBackend.controllers;
 
 import com.dominAItionBackend.service.AIService;
 import com.dominAItionBackend.service.GameService;
+import com.dominAItionBackend.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,9 @@ public class AIController {
     @Autowired
     private GameService gameService;
 
+    @Autowired
+    private WorldService worldService;
+
     //main story endpoint (/api/ai/story)
     @PostMapping("/story")
     public String promptRespond(@RequestBody Map<String, String> requestBody) {
@@ -27,10 +31,20 @@ public class AIController {
     }
 
     //World Defining Endpoint
+
+    /**
+     * Handles world definition requests.
+     * Example Request Body:
+     * {
+     *     "userId": "1",
+     *     "request": "This is a basic US map"
+     * }
+     */
     @PostMapping("/world")
     public String worldDefinition(@RequestBody Map<String, String> requestBody) {
+        String userId = requestBody.get("userId");
         String request = requestBody.get("request");
-        return aiService.callWorldDefiningAgent(request);
+        return worldService.handleWorldRequest(userId, request);
     }
 
     //Character Defining Endpoint

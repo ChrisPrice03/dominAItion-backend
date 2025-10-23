@@ -18,7 +18,7 @@ public class AIService {
     @PostConstruct
     public void startPythonAgent() {
         try {
-            String command = "python3 src/main/java/com/dominAItionBackend/agents/agent_api.py";
+            String command = "py src/main/java/com/dominAItionBackend/agents/agent_api.py";
             Process process = Runtime.getRuntime().exec(command);
 
 //             Read the standard output of the process
