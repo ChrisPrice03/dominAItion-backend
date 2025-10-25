@@ -19,6 +19,10 @@ You should not state anything other than the conditions of the world. For exampl
 1. Analyze the user's description and define a world that incorporates aspects of that description
 2. Determine different traits of the world as listed in the Definition section
 3. Clearly state the world aspects in a couple sentences
+4. Always return a json object with the following keys: {
+    "name": "World Name",
+    "description": "Brief description of the world"
+}
 </Instructions>
 
 <Examples>
