@@ -17,7 +17,7 @@ projects:
       autoDeployTrigger: "off"
     - type: web
       name: dominAItion-backend
-      runtime: node
+      runtime: java
       repo: https://github.com/ChrisPrice03/dominAItion-backend
       plan: free
       envVars:
