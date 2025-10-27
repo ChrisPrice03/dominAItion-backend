@@ -1,22 +1,9 @@
 version: "1"
-
 projects:
-  - name: DominAItion
+  - name: DominAItion-Backend
     environments:
       - name: Production
         services:
-          # Frontend service
-          - type: web
-            name: DominAItion Frontend
-            env: node
-            repo: https://github.com/Hbenyacar/DominAItion-frontend
-            plan: free
-            region: ohio
-            buildCommand: export NODE_OPTIONS="--max_old_space_size=1024" && npm install && npm run build
-            startCommand: npx serve -s build
-            autoDeployTrigger: "off"
-
-          # Backend service
           - type: web
             name: dominAItion-backend
             env: java
