@@ -1,9 +1,29 @@
-services:
-  - type: web
-    name: dominAItion-backend
-    env: java
-    buildCommand: "./gradlew build"
-    startCommand: "java -jar build/libs/dominAItion-backend-0.0.1-SNAPSHOT.jar"
-    envVars:
+# Exported from Render on 2025-10-27T18:35:58Z
+version: "1"
+projects:
+- name: DominAItion
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: DominAItion Frontend
+      runtime: node
+      repo: https://github.com/Hbenyacar/DominAItion-frontend
+      plan: free
+      region: ohio
+      buildCommand: export NODE_OPTIONS="--max_old_space_size=1024" && npm install
+        && npm run build
+      startCommand: npx serve -s build
+      autoDeployTrigger: "off"
+    - type: web
+      name: dominAItion-backend
+      runtime: node
+      repo: https://github.com/ChrisPrice03/dominAItion-backend
+      plan: free
+      envVars:
       - key: JAVA_VERSION
-        value: 17
+        sync: false
+      region: ohio
+      buildCommand: ./gradlew build
+      startCommand: ./gradlew bootrun
+      autoDeployTrigger: "off"
