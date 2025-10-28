@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,5 +31,9 @@ public class GameController {
         int winningPoints = Integer.parseInt(requestBody.get("winningPoints"));
         return gameService.createGame(worldId, winningPoints);
     }
-
+    @PostMapping("/territories")
+    public List<Map<String, Object>> getTerritories(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        return gameService.getTerritoriesByGameId(gameId);
+    }
 }

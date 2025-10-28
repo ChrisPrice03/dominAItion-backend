@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface TerritoryRepository extends MongoRepository<Territory, String> {
     List<Territory> findByGameIdAndOwnerId(String gameId, String ownerId);
+    List<Territory> findByGameId(String worldId);
 }
