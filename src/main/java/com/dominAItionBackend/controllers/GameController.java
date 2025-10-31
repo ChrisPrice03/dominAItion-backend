@@ -36,4 +36,11 @@ public class GameController {
         String gameId = requestBody.get("gameId");
         return gameService.getTerritoriesByGameId(gameId);
     }
+
+    @PostMapping("/addPlayer")
+    public boolean addPlayerToGame(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        String playerId = requestBody.get("playerId");
+        return gameService.addPlayerToGame(gameId, playerId);
+    }
 }

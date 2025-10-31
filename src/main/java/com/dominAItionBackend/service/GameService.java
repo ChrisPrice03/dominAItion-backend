@@ -91,4 +91,20 @@ public class GameService {
         }
         return territoryDetails;
     }
+
+    public boolean addPlayerToGame(String gameId, String playerId) {
+        // Fetch the game by its ID
+        Game game = gameRepository.findById(gameId).orElse(null);
+        if (game == null) {
+            return false; // Game not found
+        }
+
+        // Add the player to the game's player list if not already present
+        if (!game.getPlayerIds().contains(playerId)) {
+            game.getPlayerIds().add(playerId);
+            gameRepository.save(game);
+        }
+
+        return true; // Player successfully added
+    }
 }
