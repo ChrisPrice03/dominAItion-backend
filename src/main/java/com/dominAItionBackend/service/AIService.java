@@ -91,4 +91,13 @@ public class AIService {
         var response = restTemplate.postForObject(url, request, java.util.Map.class);
         return response != null ? response.get("response").toString() : "No response from agent";
     }
+
+    public String callSummaryAgent(String input) {
+        String url = "http://localhost:5000/summary";
+        var request = new java.util.HashMap<String, String>();
+        request.put("input", input);
+
+        var response = restTemplate.postForObject(url, request, java.util.Map.class);
+        return response != null ? response.get("response").toString() : "No response from agent";
+    }
 }

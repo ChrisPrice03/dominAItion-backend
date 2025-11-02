@@ -27,6 +27,7 @@ public class Game {
     private int joinCode; // code to join the game
     private String joinURL; // URL to join the game
     private String chatId; // chat associated with the game
+    private String summary; // brief summary of the game
 
     // Default constructor with list initialization
     public Game() {
@@ -94,4 +95,6 @@ public class Game {
     public void setJoinURL(String joinURL) { this.joinURL = joinURL; }
     public String getChatId() { return chatId; }
     public void setChatId(String chatId) { this.chatId = chatId; }
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
 }

@@ -115,6 +115,12 @@ public class GameService {
 
             game.setPlayerPoints(playerPoints);
 
+            // updating game log
+            String logUpdate = root.path("log_note").asText("");
+            if (!logUpdate.isEmpty()) {
+                game.addToGameLog(logUpdate);
+            }
+
             // Check for a winner
             Optional<Map.Entry<String, Integer>> winner = playerPoints.entrySet().stream()
                     .filter(entry -> entry.getValue() >= game.getWinningPoints())
@@ -122,14 +128,12 @@ public class GameService {
 
             if (winner.isPresent()) {
                 String winningPlayerId = winner.get().getKey();
+                game.addToGameLog("Player " + winningPlayerId + " has won the game with " + winner.get().getValue() + " points!");
                 System.out.println("Player " + winningPlayerId + " has reached " + winner.get().getValue() + " points and wins the game!");
                 game.setStatus("Completed");
-            }
 
-            // updating game log
-            String logUpdate = root.path("log_note").asText("");
-            if (!logUpdate.isEmpty()) {
-                game.addToGameLog(logUpdate);
+                String summary = aiService.callSummaryAgent(game.getGame_log());
+                game.setSummary(summary);
             }
 
             // Save updated game state
@@ -208,5 +212,32 @@ public class GameService {
         gameRepository.save(game);
 
         return true; // Game successfully started
+    }
+
+    public Map<String, Object> getGameInfo(String gameId) {
+        Game game = gameRepository.findById(gameId).orElse(null);
+        if (game == null) {
+            return Collections.emptyMap(); // Game not found
+        }
+
+        Map<String, Object> gameInfo = new HashMap<>();
+        gameInfo.put("gameId", game.getId());
+        gameInfo.put("worldId", game.getWorldId());
+        gameInfo.put("status", game.getStatus());
+        gameInfo.put("playerIds", game.getPlayerIds());
+        gameInfo.put("playerPoints", game.getPlayerPoints());
+        gameInfo.put("winningPoints", game.getWinningPoints());
+        gameInfo.put("gameLog", game.getGame_log());
+
+        //creating summary if game is not completed
+        if (!game.getStatus().equals("Completed") || game.getSummary() == null || game.getSummary().isEmpty()) {
+            String summary = aiService.callSummaryAgent(game.getGame_log());
+            game.setSummary(summary);
+            gameRepository.save(game);
+        }
+
+        gameInfo.put("summary", game.getSummary());
+
+        return gameInfo;
     }
 }

@@ -11,10 +11,6 @@ class OrchestrationAgent(Agent):
         super().__init__()
 
     def orchestrationRequest(self, input_data):
-        """
-        A simple test method that returns a response.
-        """
-        # Temporarily using openai key here, will switch bedrock model later
         model = OpenAIModel(
             client_args={
                 "api_key": API_KEY,

@@ -64,4 +64,10 @@ public class GameController {
         String gameId = requestBody.get("gameId");
         return gameService.startGame(gameId);
     }
+
+    @PostMapping("/getInfo")
+    public Map<String, Object> getGameInfo(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        return gameService.getGameInfo(gameId);
+    }
 }
