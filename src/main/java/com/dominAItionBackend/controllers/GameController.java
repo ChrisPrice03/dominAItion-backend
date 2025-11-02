@@ -37,10 +37,31 @@ public class GameController {
         return gameService.getTerritoriesByGameId(gameId);
     }
 
+    /**
+     * Adds a player to a game.
+     * Example Request Body:
+     * {
+     *     "gameId": "68fa872b8636ca5f883a4a1a",
+     *     "playerId": "player123"
+     * }
+     */
     @PostMapping("/addPlayer")
     public boolean addPlayerToGame(@RequestBody Map<String, String> requestBody) {
         String gameId = requestBody.get("gameId");
         String playerId = requestBody.get("playerId");
         return gameService.addPlayerToGame(gameId, playerId);
+    }
+
+    /**
+     * Starts a game.
+     * Example Request Body:
+     * {
+     *     "gameId": "68fa872b8636ca5f883a4a1a"
+     * }
+     */
+    @PostMapping("/start")
+    public boolean startGame(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        return gameService.startGame(gameId);
     }
 }

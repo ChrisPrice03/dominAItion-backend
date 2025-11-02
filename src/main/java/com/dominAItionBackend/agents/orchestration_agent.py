@@ -21,7 +21,7 @@ class OrchestrationAgent(Agent):
             },
             model_id="gpt-5-nano",
             params={
-                "max_completion_tokens": 5000,
+                "max_completion_tokens": 8000,
 
             }
         )

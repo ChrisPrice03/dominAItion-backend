@@ -4,16 +4,14 @@ import com.dominAItionBackend.models.Game;
 import com.dominAItionBackend.models.Territory;
 import com.dominAItionBackend.repository.GameRepository;
 import com.dominAItionBackend.repository.TerritoryRepository;
+import com.dominAItionBackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class GameService {
@@ -29,17 +27,56 @@ public class GameService {
     private GameRepository gameRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     TerritoryRepository territoryRepository;
 
-    public String handleStoryRequest(String input) {
-        //call an internal function to pull relevant game state
-        String response = aiService.callOrchestrationAgent(input);
-        String storyUpdate = interpretAgentResponse(response);
+    public String handleStoryRequest(String gameId, String playerId, String request) {
+        //pulling game state
+        Game game = gameRepository.findById(gameId).orElse(null);
+        if (game == null) {
+            return "Error: Game not found"; // Game not found
+        }
+
+        //constructing prompt for AI
+        String prompt = "Game State: " + extractRelevantGameState(game) + "\n"
+                + "Player ID: " + playerId + "\n"
+                + "Request: " + request + "\n"
+                + "Provide the next event in the game based on the current state and request.";
+
+        System.out.println("Prompt sent to AI:\n" + prompt);
+
+        String response = aiService.callOrchestrationAgent(prompt);
+        System.out.println("Response from AI:\n" + response);
+
+        String storyUpdate = interpretAgentResponse(game, response);
         return storyUpdate;
     }
 
-    public String interpretAgentResponse(String response) {
-        //TODO: add logic to update game state
+    public String extractRelevantGameState(Game game) {
+        List<String> playerIds = game.getPlayerIds();
+        List<Map<String, Object>> territoryInfo = getTerritoriesByGameId(game.getId());
+        String gameLog = game.getGame_log();
+
+        //getting player names
+        List<Map<String, String>> playerInfoList = new ArrayList<>();
+
+        for (String playerId : playerIds) {
+            userRepository.findById(playerId).ifPresent(user -> {
+                Map<String, String> playerInfo = new HashMap<>();
+                playerInfo.put("id", user.getId());
+                playerInfo.put("name", user.getUsername());
+                playerInfoList.add(playerInfo);
+            });
+        }
+
+        return "Players: " + playerInfoList.toString() + "\n"
+                + "Territories: " + territoryInfo.toString() + "\n"
+                + "Game Log: " + gameLog;
+    }
+
+    public String interpretAgentResponse(Game game, String response) {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -47,6 +84,56 @@ public class GameService {
 
             String jsonified = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
             System.out.println("Full JSON:\n" + jsonified);
+
+            //updating territory ownership
+            JsonNode territoryList = root.path("territoryList");
+
+            if (territoryList.isArray()) {
+                for (JsonNode territoryNode : territoryList) {
+                    String territoryId = territoryNode.path("territoryId").asText(null);
+                    String ownerId = territoryNode.path("ownerId").isNull() ? null : territoryNode.path("ownerId").asText();
+
+                    if (territoryId != null) {
+                        territoryRepository.findById(territoryId).ifPresent(territory -> {
+                            territory.setOwnerID(ownerId);
+                            territoryRepository.save(territory);
+                        });
+                    }
+                }
+            }
+
+            //updating player points
+            Map<String, Integer> playerPoints = new HashMap<>();
+            List<Territory> allTerritories = territoryRepository.findByGameId(game.getId());
+
+            for (Territory territory : allTerritories) {
+                String ownerId = territory.getOwnerID();
+                if (ownerId != null) {
+                    playerPoints.put(ownerId, playerPoints.getOrDefault(ownerId, 0) + territory.getPointVal());
+                }
+            }
+
+            game.setPlayerPoints(playerPoints);
+
+            // Check for a winner
+            Optional<Map.Entry<String, Integer>> winner = playerPoints.entrySet().stream()
+                    .filter(entry -> entry.getValue() >= game.getWinningPoints())
+                    .findFirst();
+
+            if (winner.isPresent()) {
+                String winningPlayerId = winner.get().getKey();
+                System.out.println("Player " + winningPlayerId + " has reached " + winner.get().getValue() + " points and wins the game!");
+                game.setStatus("Completed");
+            }
+
+            // updating game log
+            String logUpdate = root.path("log_note").asText("");
+            if (!logUpdate.isEmpty()) {
+                game.addToGameLog(logUpdate);
+            }
+
+            // Save updated game state
+            gameRepository.save(game);
 
             return root.path("outcome").asText("No outcome found");
         } catch (Exception e) {
@@ -84,6 +171,7 @@ public class GameService {
         List<Map<String, Object>> territoryDetails = new ArrayList<>();
         for (Territory territory : territories) {
             Map<String, Object> details = new HashMap<>();
+            details.put("territoryId", territory.getId());
             details.put("territoryName", territory.getTerritoryName());
             details.put("pointValue", territory.getPointVal());
             details.put("ownerId", territory.getOwnerID());
@@ -106,5 +194,19 @@ public class GameService {
         }
 
         return true; // Player successfully added
+    }
+
+    public boolean startGame(String gameId) {
+        // Fetch the game by its ID
+        Game game = gameRepository.findById(gameId).orElse(null);
+        if (game == null) {
+            return false; // Game not found
+        }
+
+        // Update the game's status to "ongoing"
+        game.setStatus("ongoing");
+        gameRepository.save(game);
+
+        return true; // Game successfully started
     }
 }

@@ -24,10 +24,21 @@ public class AIController {
     private WorldService worldService;
 
     //main story endpoint (/api/ai/story)
+
+    /**
+     * Handles story requests.
+     * {
+     * "gameId": "68fa872b8636ca5f883a4a1a",
+     *  "playerId": "player123"
+     *  "request": "Describe the next event in the game"
+     * }
+     */
     @PostMapping("/story")
     public String promptRespond(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        String playerId = requestBody.get("playerId");
         String request = requestBody.get("request");
-        return gameService.handleStoryRequest(request);
+        return gameService.handleStoryRequest(gameId, playerId, request);
     }
 
     //World Defining Endpoint
