@@ -65,6 +65,13 @@ public class GameController {
         return gameService.startGame(gameId);
     }
 
+    /**
+     * Gets game information.
+     * Example Request Body:
+     * {
+     *    "gameId": "68fa872b8636ca5f883a4a1a"
+     * }
+     */
     @PostMapping("/getInfo")
     public Map<String, Object> getGameInfo(@RequestBody Map<String, String> requestBody) {
         String gameId = requestBody.get("gameId");
