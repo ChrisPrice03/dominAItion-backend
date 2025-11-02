@@ -286,7 +286,6 @@ public class UserController {
         return ResponseEntity.ok(friendList);
     }
 
-
     // Block a user (remove from friends and prevent future requests)
     @PutMapping("/blockUser/{email}/{blockedId}")
     public ResponseEntity<?> blockUser(
@@ -344,8 +343,6 @@ public class UserController {
         userRepository.save(user);
         return ResponseEntity.ok("User unblocked successfully.");
     }
-
-
     
     @PutMapping("/updateProfile/{email}")
     public ResponseEntity<?> updateProfile(
@@ -499,7 +496,4 @@ public class UserController {
 
         return ResponseEntity.ok(user);
     }
-
-
-
 }
