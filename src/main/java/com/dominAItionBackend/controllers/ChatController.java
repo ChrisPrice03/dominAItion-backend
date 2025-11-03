@@ -13,7 +13,10 @@ import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/chats")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://dominaition-frontend.onrender.com"
+})
 public class ChatController {
 
     @Autowired
