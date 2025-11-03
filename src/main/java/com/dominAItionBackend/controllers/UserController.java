@@ -26,7 +26,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000") // allow React frontend
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://dominaition-frontend.onrender.com"
+})
 public class UserController {
 
     @Autowired

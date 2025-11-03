@@ -4,7 +4,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://dominaition-frontend.onrender.com"
+})
 public class LoginController {
 
     // Example: normally you'd inject a UserService to check credentials

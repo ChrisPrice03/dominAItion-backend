@@ -18,7 +18,10 @@ import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/bugs")
-@CrossOrigin(origins = "http://localhost:3000")  // ✅ re-enable this
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://dominaition-frontend.onrender.com"
+})
 public class BugReportController {
 
     @Autowired

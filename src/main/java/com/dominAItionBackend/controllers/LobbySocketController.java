@@ -21,7 +21,10 @@ import com.dominAItionBackend.repository.LobbyRepository;
 
 @RestController
 @RequestMapping("/api/lobby")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "http://localhost:3000",
+    "https://dominaition-frontend.onrender.com"
+})
 public class LobbySocketController {
 
     @Autowired 
