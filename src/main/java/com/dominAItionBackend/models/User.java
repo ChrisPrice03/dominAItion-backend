@@ -103,8 +103,8 @@ public class User {
     public int getLosses() { return losses; }
     public void setLosses(int losses) { this.losses = losses; }
 
-    public int getTotalPlayTime() { return totalPlayTime; }
-    public int setTotalPlayTime(int totalPlayTime) { this.totalPlayTime = totalPlayTime; }
+    public double getTotalPlayTime() { return totalPlayTime; }
+    public void setTotalPlayTime(double totalPlayTime) { this.totalPlayTime = totalPlayTime; }
 
     public int getGamesPlayed() { return gamesPlayed; }
     public void setGamesPlayed(int gamesPlayed) { this.gamesPlayed = gamesPlayed; }
