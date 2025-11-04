@@ -17,8 +17,7 @@ class OrchestrationAgent(Agent):
             },
             model_id="gpt-5-nano",
             params={
-                "max_completion_tokens": 8000,
-
+                "max_completion_tokens": 10000,
             }
         )
 
@@ -27,7 +26,7 @@ class OrchestrationAgent(Agent):
             system_prompt=ORCHESTRATION_PROMPT,
             tools=[
                 roll_die,
-                detect_cheat,
+                determine_intent,
                 determine_intent,
             ],
         )

@@ -1,9 +1,7 @@
 from strands import Agent, tool
 from strands.models.openai import OpenAIModel
-from system_prompts.orchestration_prompt import ORCHESTRATION_PROMPT
+from system_prompts.player_prompt import PLAYER_PROMPT
 from dice_tool import roll_die
-from anticheat_agent import detect_cheat
-from intent_agent import determine_intent
 from api_key import API_KEY
 
 class PlayerAgent(Agent):
@@ -36,7 +34,8 @@ class PlayerAgent(Agent):
 
 if __name__ == "__main__":
     agent = PlayerAgent()
-    agent.PlayerRequest("Make A Move with an aggressive strategy")
+    agent.makeTurnRequest("Make A Move with an aggressive strategy")
     #agent.PlayerRequest("Make a Move with a defensive strategy.")
     #agent.PlayerRequest("Make a Move with an avoidant strategy")
 
+    #return json with territories aiming to defend
