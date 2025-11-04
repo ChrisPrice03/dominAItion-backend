@@ -32,7 +32,7 @@ public class GameService {
     @Autowired
     TerritoryRepository territoryRepository;
 
-    public String handleStoryRequest(String gameId, String playerId, String request) {
+    public String handleStoryRequest(String gameId, String playerId, String request, int difficulty) {
         //pulling game state
         Game game = gameRepository.findById(gameId).orElse(null);
         if (game == null) {
@@ -44,6 +44,16 @@ public class GameService {
                 + "Player ID: " + playerId + "\n"
                 + "Request: " + request + "\n"
                 + "Provide the next event in the game based on the current state and request.";
+
+        if (difficulty == 1) {
+            prompt += "Ensure the player gets what they want to some degree. Make their chance of success slightly high";
+        }
+        else if (difficulty == 2) {
+            prompt += "Ensure the player has a fair chance of getting what they want, but not without resistance or pushback";
+        }
+        else if (difficulty == 3) {
+            prompt += "Ensure the player has a difficult time getting what they want. Add many challenges and make it super hard for them to acheive their goal";
+        }
 
         System.out.println("Prompt sent to AI:\n" + prompt);
 

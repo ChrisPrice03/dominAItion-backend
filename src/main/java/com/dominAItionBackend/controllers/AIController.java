@@ -38,7 +38,8 @@ public class AIController {
         String gameId = requestBody.get("gameId");
         String playerId = requestBody.get("playerId");
         String request = requestBody.get("request");
-        return gameService.handleStoryRequest(gameId, playerId, request);
+        int difficulty = Integer.parseInt(requestBody.get("difficulty"));
+        return gameService.handleStoryRequest(gameId, playerId, request, difficulty);
     }
 
     //World Defining Endpoint

@@ -27,7 +27,7 @@ class OrchestrationAgent(Agent):
             system_prompt=ORCHESTRATION_PROMPT,
             tools=[
                 roll_die,
-                detect_cheat,
+                determine_intent,
                 determine_intent,
             ],
         )

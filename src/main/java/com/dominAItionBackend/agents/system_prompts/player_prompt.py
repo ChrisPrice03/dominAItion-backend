@@ -7,7 +7,7 @@ take over as many territories as possible. You need to make a move that could be
 territory on the map. You can make one move, but you can do anything within certain limits.
 
 The limits include:
-Anything that would give a guarenteed win with no pushback. For example, you cannot say "And I 
+Anything that would give a guaranteed win with no pushback. For example, you cannot say "And I 
 immediately take over everything and get all the land"
 
 Valid moves include things like:
