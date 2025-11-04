@@ -21,8 +21,10 @@ public class User {
     private int wins;
     private int losses;
     private int gamesPlayed;
+    private double totalPlayTime;
 
     private boolean emailVerified;
+    private boolean musicEnabled;
 
     private Date time;
 
@@ -57,11 +59,13 @@ public class User {
         this.time = new Date();
         this.wins = 0;
         this.losses = 0;
+        this.totalPlayTime = 0;
         this.gamesPlayed = 0;
         this.human = false;
         this.isPublic = true;
         this.online = false;
         this.emailVerified = false;
+        this.musicEnabled = true;
     }
 
     // Constructor for quick creation
@@ -71,6 +75,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.emailVerified = false;
+        this.musicEnabled = true;
     }
 
     // --- Getters and Setters ---
@@ -98,11 +103,17 @@ public class User {
     public int getLosses() { return losses; }
     public void setLosses(int losses) { this.losses = losses; }
 
+    public double getTotalPlayTime() { return totalPlayTime; }
+    public void setTotalPlayTime(double totalPlayTime) { this.totalPlayTime = totalPlayTime; }
+
     public int getGamesPlayed() { return gamesPlayed; }
     public void setGamesPlayed(int gamesPlayed) { this.gamesPlayed = gamesPlayed; }
 
     public boolean isEmailVerified() { return emailVerified; }       
     public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public boolean isMusicEnabled() { return musicEnabled; }
+    public void setMusicEnabled(boolean musicEnabled) { this.musicEnabled = musicEnabled; }
 
     public Date getTime() { return time; }
     public void setTime(Date time) { this.time = time; }
