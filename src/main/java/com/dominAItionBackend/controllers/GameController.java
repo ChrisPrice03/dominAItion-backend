@@ -27,10 +27,14 @@ public class GameController {
      */
     @PostMapping("/create")
     public String createGame(@RequestBody Map<String, String> requestBody) {
-        String worldId = requestBody.get("worldId");
+        //String worldId = requestBody.get("worldId");
+        String worldId = "69079f300a402a2b69a147d1";
         int winningPoints = Integer.parseInt(requestBody.get("winningPoints"));
+        System.out.println("winningPoints: " + winningPoints);
         return gameService.createGame(worldId, winningPoints);
     }
+
+
     @PostMapping("/territories")
     public List<Map<String, Object>> getTerritories(@RequestBody Map<String, String> requestBody) {
         String gameId = requestBody.get("gameId");

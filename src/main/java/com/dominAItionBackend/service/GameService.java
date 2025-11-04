@@ -148,7 +148,7 @@ public class GameService {
 
     public String createGame(String worldId, int winningPoints) {
         Game newGame = new Game(worldId, winningPoints);
-
+        
         //generate territories for game
         List<String> territories = worldService.generateTerritories(worldId);
         newGame.setTerritoryIds(territories);
