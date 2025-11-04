@@ -3,6 +3,7 @@ package com.dominAItionBackend.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,16 +15,24 @@ public class Lobby {
     private String id;
 
     @DBRef
-    private List<User> users = new ArrayList<>(); // always initialized
+    private List<User> users = new ArrayList<>();
 
     private String map = "default";
+    private String code;
+
+    @Field("isPrivate") // store in MongoDB as "isPrivate"
+    private boolean privateLobby;
 
     // Default constructor
     public Lobby() {}
 
-    public Lobby(String id, String map) {
+    // Full constructor
+    public Lobby(String id, List<User> users, String map, String code, boolean privateLobby) {
         this.id = id;
-        this.map = map;
+        this.users = users != null ? users : new ArrayList<>();
+        this.map = map != null ? map : "default";
+        this.code = code;
+        this.privateLobby = privateLobby;
     }
 
     // --- Getters & Setters ---
@@ -35,6 +44,12 @@ public class Lobby {
 
     public String getMap() { return map; }
     public void setMap(String map) { this.map = map; }
+
+    public String getCode() { return code; }
+    public void setCode(String code) { this.code = code; }
+
+    public boolean isPrivateLobby() { return privateLobby; }
+    public void setPrivateLobby(boolean privateLobby) { this.privateLobby = privateLobby; }
 
     // Add / remove user
     public void addUser(User user) {

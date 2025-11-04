@@ -499,4 +499,31 @@ public class UserController {
 
         return ResponseEntity.ok(user);
     }
+
+    /* ---------------------- BACKGROUND MUSIC ---------------------- */
+    @PutMapping("/backgroundMusic/{email}")
+    public ResponseEntity<Map<String, Object>> updateMusicPreference(
+            @PathVariable String email,
+            @RequestBody Map<String, Boolean> body) {
+
+        boolean musicEnabled = body.getOrDefault("musicEnabled", true);
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("success", false, "message", "User not found"));
+        }
+        
+        user.setMusicEnabled(musicEnabled);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Background music preference updated successfully",
+                "musicEnabled", musicEnabled
+        ));
+    }
+
+
 }
