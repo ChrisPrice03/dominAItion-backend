@@ -207,6 +207,15 @@ public class GameService {
             gameRepository.save(game);
         }
 
+        //Fetch the user by its ID
+        userRepository.findById(playerId).ifPresent(user -> {
+            // Add the game to the user's saved games if not already present
+            if (!user.getSavedGameIds().contains(gameId)) {
+                user.getSavedGameIds().add(gameId);
+                userRepository.save(user);
+            }
+        });
+
         return true; // Player successfully added
     }
 
