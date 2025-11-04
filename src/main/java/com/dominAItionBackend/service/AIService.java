@@ -18,7 +18,7 @@ public class AIService {
     @PostConstruct
     public void startPythonAgent() {
         try {
-            String command = "py src/main/java/com/dominAItionBackend/agents/agent_api.py";
+            String command = "python3 -u src/main/java/com/dominAItionBackend/agents/agent_api.py";
             Process process = Runtime.getRuntime().exec(command);
 
 //             Read the standard output of the process
@@ -84,6 +84,8 @@ public class AIService {
     }
 
     public String callTerritoryGeneratingAgent(String input) {
+        System.out.println("input: "+ input);
+
         String url = "http://localhost:5000/territories";
         var request = new java.util.HashMap<String, String>();
         request.put("input", input);

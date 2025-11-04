@@ -52,12 +52,17 @@ public class WorldService {
     }
 
     public List<String> generateTerritories(String worldID) {
+
         //get the world description from the database
         World world = worldRepository.findById(worldID).orElse(null);
         String worldDescription = world != null ? world.getDescription() : "";
+        
+        System.out.println("world: " + world);
+        System.out.println("worldDesc: " + worldDescription);
 
         //call AI service to generate territories for the world
         String response = aiService.callTerritoryGeneratingAgent(worldDescription);
+        
         try {
             ObjectMapper mapper = new ObjectMapper();
 
@@ -83,8 +88,11 @@ public class WorldService {
                 territoryIds.add(savedTerritory.getId());
             });
 
+            System.out.println("ITS HERE");
+
             return territoryIds;
         } catch (Exception e) {
+            System.out.println("HERE IS THE ERROR:");
             e.printStackTrace();
             return List.of();
         }

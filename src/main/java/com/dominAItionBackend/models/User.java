@@ -44,6 +44,8 @@ public class User {
     private List<String> chatIds;
     private List<String> achievementIds;
 
+    
+
     // Default constructor with list initialization
     public User() {
         this.friendIds = new ArrayList<>();
