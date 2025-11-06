@@ -1,6 +1,8 @@
 package com.dominAItionBackend.service;
 
 import jakarta.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,6 +12,9 @@ import java.io.IOException;
 @Service
 public class AIService {
     private final RestTemplate restTemplate;
+
+    @Value("${BACKEND_URL:http://localhost:5000}")
+    private String openAIBaseURL;
 
     public AIService() {
         this.restTemplate = new RestTemplate();
@@ -57,7 +62,7 @@ public class AIService {
     }
 
     public String callOrchestrationAgent(String input) {
-        String url = "http://localhost:5000/orchestrate";
+        String url = openAIBaseURL + "/orchestrate";
         var request = new java.util.HashMap<String, String>();
         request.put("input", input);
 
@@ -66,7 +71,7 @@ public class AIService {
     }
 
     public String callWorldDefiningAgent(String input) {
-        String url = "http://localhost:5000/world";
+        String url = openAIBaseURL + "/world";
         var request = new java.util.HashMap<String, String>();
         request.put("input", input);
 
@@ -75,7 +80,7 @@ public class AIService {
     }
 
     public String callCharacterDefiningAgent(String input) {
-        String url = "http://localhost:5000/character";
+        String url = openAIBaseURL + "/character";
         var request = new java.util.HashMap<String, String>();
         request.put("input", input);
 
@@ -86,7 +91,7 @@ public class AIService {
     public String callTerritoryGeneratingAgent(String input) {
         System.out.println("input: "+ input);
 
-        String url = "http://localhost:5000/territories";
+        String url = openAIBaseURL + "/territories";
         var request = new java.util.HashMap<String, String>();
         request.put("input", input);
 
@@ -95,7 +100,7 @@ public class AIService {
     }
 
     public String callSummaryAgent(String input) {
-        String url = "http://localhost:5000/summary";
+        String url = openAIBaseURL + "/summary";
         var request = new java.util.HashMap<String, String>();
         request.put("input", input);
 
