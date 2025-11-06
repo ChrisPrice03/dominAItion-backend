@@ -355,6 +355,7 @@ public class UserController {
 
         String newUsername = body.get("username");
         String newBio = body.get("bio");
+        boolean newNotificationsEnabled = body.get("notificationsEnabled").equalsIgnoreCase("true");
 
         if (newUsername == null || newUsername.trim().isEmpty()) {
             return ResponseEntity.badRequest().body("Username cannot be empty");
@@ -371,6 +372,7 @@ public class UserController {
 
         user.setUsername(newUsername);
         user.setBio(newBio);
+        user.setNotificationsEnabled(newNotificationsEnabled);
         userRepository.save(user);
 
         return ResponseEntity.ok(user);

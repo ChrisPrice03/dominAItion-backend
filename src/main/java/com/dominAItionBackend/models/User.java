@@ -36,6 +36,7 @@ public class User {
     private boolean human;
     private boolean isPublic;
     private boolean online;
+    private boolean notificationsEnabled;
 
     private List<String> savedCharIds;
     private List<String> savedWorldIds;
@@ -68,6 +69,7 @@ public class User {
         this.online = false;
         this.emailVerified = false;
         this.musicEnabled = true;
+        this.notificationsEnabled = true;
     }
 
     // Constructor for quick creation
@@ -78,6 +80,7 @@ public class User {
         this.password = password;
         this.emailVerified = false;
         this.musicEnabled = true;
+        this.notificationsEnabled = true;
     }
 
     // --- Getters and Setters ---
@@ -116,6 +119,9 @@ public class User {
 
     public boolean isMusicEnabled() { return musicEnabled; }
     public void setMusicEnabled(boolean musicEnabled) { this.musicEnabled = musicEnabled; }
+
+    public boolean isNotificationsEnabled() { return notificationsEnabled; }
+    public void setNotificationsEnabled(boolean notificationsEnabled) { this.notificationsEnabled = notificationsEnabled; }
 
     public Date getTime() { return time; }
     public void setTime(Date time) { this.time = time; }
