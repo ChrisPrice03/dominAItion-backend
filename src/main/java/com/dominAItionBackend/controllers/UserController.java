@@ -12,6 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.*;
 
 import com.dominAItionBackend.service.EmailService;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
 
 
 @RestController
@@ -557,5 +561,20 @@ public class UserController {
                 "success", true,
                 "games", gameInfoList
         ));
+    }
+
+    /* WINS AND LOSSES */
+    @PutMapping("/wins/{email}")
+    public int getWins(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return -1;
+        }
+
+        int wins = user.getWins();
+        user.setWins(user.getWins() + 1);
+        userRepository.save(user);
+
+        return wins + 1;
     }
 }
