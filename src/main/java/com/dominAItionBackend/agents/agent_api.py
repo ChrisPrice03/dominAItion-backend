@@ -1,4 +1,6 @@
 from flask import Flask, request, jsonify
+import os
+from flask_cors import CORS
 
 from world_definining_agent import WorldDefiningAgent
 from orchestration_agent import OrchestrationAgent
@@ -9,6 +11,9 @@ agent = OrchestrationAgent()
 worldAgent = WorldDefiningAgent()
 territoryAgent = TerritoryAgent()
 summaryAgent = SummaryAgent()
+
+app = Flask(__name__)
+CORS(app)
 
 #this file is used as a way to connect python to java
 @app.route('/orchestrate', methods=['POST'])
@@ -42,4 +47,5 @@ def summarize():
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

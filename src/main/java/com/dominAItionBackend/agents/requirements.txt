@@ -1,0 +1,5 @@
+strands-agents
+flask
+'strands-agents[openai]' strands-agents-tools
+flask-cors
+requests
