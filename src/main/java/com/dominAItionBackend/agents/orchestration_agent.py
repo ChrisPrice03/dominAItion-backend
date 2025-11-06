@@ -4,7 +4,17 @@ from system_prompts.orchestration_prompt import ORCHESTRATION_PROMPT
 from dice_tool import roll_die
 from anticheat_agent import detect_cheat
 from intent_agent import determine_intent
-from api_key import API_KEY
+import os
+
+# --- API key setup ---
+try:
+    # Try importing local file first (for local development)
+    from api_key import API_KEY
+except ModuleNotFoundError:
+    # Fallback to environment variable (for deployment)
+    API_KEY = os.environ.get("OPENAI_API_KEY")
+if not API_KEY:
+    raise ValueError("OpenAI API key not found. Set it in api_key.py or OPENAI_API_KEY environment variable.")
 
 class OrchestrationAgent(Agent):
     def __init__(self):

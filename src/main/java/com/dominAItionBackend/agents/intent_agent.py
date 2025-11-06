@@ -1,7 +1,17 @@
 from strands import Agent, tool
 from strands.models.openai import OpenAIModel
 from system_prompts.intent_prompt import INTENT_PROMPT
-from api_key import API_KEY
+import os
+
+# --- API key setup ---
+try:
+    # Try importing local file first (for local development)
+    from api_key import API_KEY
+except ModuleNotFoundError:
+    # Fallback to environment variable (for deployment)
+    API_KEY = os.environ.get("OPENAI_API_KEY")
+if not API_KEY:
+    raise ValueError("OpenAI API key not found. Set it in api_key.py or OPENAI_API_KEY environment variable.")
 
 @tool
 def determine_intent(action: str) -> str:
