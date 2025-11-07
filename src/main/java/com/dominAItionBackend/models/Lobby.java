@@ -19,6 +19,7 @@ public class Lobby {
 
     private String map = "default";
     private String code;
+    private boolean single;
 
     @Field("isPrivate") // store in MongoDB as "isPrivate"
     private boolean privateLobby;
@@ -27,17 +28,21 @@ public class Lobby {
     public Lobby() {}
 
     // Full constructor
-    public Lobby(String id, List<User> users, String map, String code, boolean privateLobby) {
+    public Lobby(String id, List<User> users, String map, String code, boolean privateLobby, boolean single) {
         this.id = id;
         this.users = users != null ? users : new ArrayList<>();
         this.map = map != null ? map : "default";
         this.code = code;
         this.privateLobby = privateLobby;
+        this.single = single;
     }
 
     // --- Getters & Setters ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+
+    public boolean getSingle() { return single; }
+    public void setSingle(boolean single) { this.single = single; }
 
     public List<User> getUsers() { return users; }
     public void setUsers(List<User> users) { this.users = users; }
