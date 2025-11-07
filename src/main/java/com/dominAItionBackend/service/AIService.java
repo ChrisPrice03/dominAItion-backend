@@ -13,7 +13,7 @@ import java.io.IOException;
 public class AIService {
     private final RestTemplate restTemplate;
 
-    @Value("${OPENAI_BASE_URL:http://localhost:5001}")
+    @Value("${OPENAI_BASE_URL:http://localhost:5000}")
     private String openAIBaseURL;
 
     public AIService() {
