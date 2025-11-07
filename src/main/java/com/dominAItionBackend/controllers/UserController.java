@@ -577,4 +577,50 @@ public class UserController {
 
         return wins + 1;
     }
+
+    /* GAMES PLAYED */
+    @PutMapping("/gamesPlayed/{email}")
+    public ResponseEntity<?> incrementGamesPlayed(@PathVariable String email) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", "User not found"));
+        }
+
+        int newGamesPlayed = user.getGamesPlayed() + 1;
+        user.setGamesPlayed(newGamesPlayed);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Games played incremented successfully",
+                "gamesPlayed", newGamesPlayed
+        ));
+    }
+
+ 
+    /* TOTAL PLAY TIME */
+    @PutMapping("/totalPlayTime/{email}")
+    public ResponseEntity<?> incrementTotalPlayTime(@PathVariable String email, @RequestBody Map<String, Double> body) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", "User not found"));
+        }
+
+        double hoursPlayed = body.getOrDefault("hours", 0.0);
+        double newTotal = user.getTotalPlayTime() + hoursPlayed;
+
+        user.setTotalPlayTime(newTotal);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Total play time incremented successfully",
+                "totalPlayTime", newTotal
+        ));
+    }
+
+
+
 }
