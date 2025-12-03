@@ -540,6 +540,7 @@ public class UserController {
         }
 
         List<String> savedGames = user.getSavedGameIds();
+        System.out.println("Saved games for user " + userId + ": " + savedGames);
 
         // Retrieve all games for those IDs
         List<Map<String, Object>> gameInfoList = new ArrayList<>();
@@ -548,10 +549,96 @@ public class UserController {
             if (game != null) {
                 Map<String, Object> gameInfo = new HashMap<>();
                 World world = worldRepository.findById(game.getWorldId()).orElse(null);
+                String leadingPlayerName = "N/A";
+                Map<String, Integer> playerPoints = game.getPlayerPoints();
+                if (playerPoints != null && !playerPoints.isEmpty()) {
+                    String leadingPlayerId = Collections.max(playerPoints.entrySet(),
+                            Map.Entry.comparingByValue()).getKey();
+                    leadingPlayerName = leadingPlayerId; // Default to ID
+                    // Try to get username
+                    User leadingPlayer = userRepository.findById(leadingPlayerId).orElse(null);
+                    if (leadingPlayer != null) {
+                        leadingPlayerName = leadingPlayer.getUsername();
+                    }
+                }
 
+                String summary = game.getSummary();
+                if (summary == null || summary.isEmpty()) {
+                    summary = "No summary available.";
+                }
+
+                gameInfo.put("gameId", game.getId());
                 gameInfo.put("World Name", world.getWorldName());
                 gameInfo.put("pointsToWin", game.getWinningPoints());
                 gameInfo.put("status", game.getStatus());
+                gameInfo.put("leadingPlayerName", leadingPlayerName);
+                gameInfo.put("summary", summary);
+
+                //System.out.println("Fetched game: " + gameInfo);
+                gameInfoList.add(gameInfo);
+            }
+        }
+
+        // Return as JSON
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "games", gameInfoList
+        ));
+    }
+
+    //fetching games with requester ID
+    @GetMapping("/fetchGames/{userId}/{requesterId}")
+    public ResponseEntity<Map<String, Object>> fetchGames(
+            @PathVariable String userId, @PathVariable String requesterId) {
+
+        User user = userRepository.findById(userId).orElse(null);
+        List<String> blockedIds = user.getBlockedIds();
+        if (blockedIds != null && blockedIds.contains(requesterId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("success", false, "message", "You are blocked by this user."));
+        }
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", "User not found"));
+        }
+
+        List<String> savedGames = user.getSavedGameIds();
+        System.out.println("Saved games for user " + userId + ": " + savedGames);
+
+        // Retrieve all games for those IDs
+        List<Map<String, Object>> gameInfoList = new ArrayList<>();
+        for (String gameId : savedGames) {
+            Game game = gameRepository.findById(gameId).orElse(null);
+            if (game != null) {
+                Map<String, Object> gameInfo = new HashMap<>();
+                World world = worldRepository.findById(game.getWorldId()).orElse(null);
+                String leadingPlayerName = "N/A";
+                Map<String, Integer> playerPoints = game.getPlayerPoints();
+                if (playerPoints != null && !playerPoints.isEmpty()) {
+                    String leadingPlayerId = Collections.max(playerPoints.entrySet(),
+                            Map.Entry.comparingByValue()).getKey();
+                    leadingPlayerName = leadingPlayerId; // Default to ID
+                    // Try to get username
+                    User leadingPlayer = userRepository.findById(leadingPlayerId).orElse(null);
+                    if (leadingPlayer != null) {
+                        leadingPlayerName = leadingPlayer.getUsername();
+                    }
+                }
+
+                String summary = game.getSummary();
+                if (summary == null || summary.isEmpty()) {
+                    summary = "No summary available.";
+                }
+
+                gameInfo.put("gameId", game.getId());
+                gameInfo.put("World Name", world.getWorldName());
+                gameInfo.put("pointsToWin", game.getWinningPoints());
+                gameInfo.put("status", game.getStatus());
+                gameInfo.put("leadingPlayerName", leadingPlayerName);
+                gameInfo.put("summary", summary);
+
+                //System.out.println("Fetched game: " + gameInfo);
                 gameInfoList.add(gameInfo);
             }
         }

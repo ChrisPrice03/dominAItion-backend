@@ -141,10 +141,10 @@ public class GameService {
                 game.addToGameLog("Player " + winningPlayerId + " has won the game with " + winner.get().getValue() + " points!");
                 System.out.println("Player " + winningPlayerId + " has reached " + winner.get().getValue() + " points and wins the game!");
                 game.setStatus("Completed");
-
-                String summary = aiService.callSummaryAgent(game.getGame_log());
-                game.setSummary(summary);
             }
+
+            String summary = aiService.callSummaryAgent(game.getGame_log());
+            game.setSummary(summary);
 
             // Save updated game state
             gameRepository.save(game);
