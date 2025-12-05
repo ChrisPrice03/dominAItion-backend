@@ -1,38 +1,80 @@
 package com.dominAItionBackend.controllers;
 
+import com.dominAItionBackend.repository.GameRepository;
+import com.dominAItionBackend.repository.LobbyRepository;
+import com.dominAItionBackend.service.GameService;
+import com.dominAItionBackend.models.Lobby;
+import com.dominAItionBackend.models.User;
+import com.dominAItionBackend.models.Game;
 import com.dominAItionBackend.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/game")
 public class GameController {
+
     @Autowired
     private GameService gameService;
 
-    // game creation endpoint (/api/game/create)
-    /**
-     * Handles world definition requests.
-     * Example Request Body:
-     * {
-     *     "worldId": "68fa872b8636ca5f883a4a1a",
-     *     "winningPoints": 20
-     * }
-     */
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private LobbyRepository lobbyRepository;
+
+    @Autowired
+    private GameRepository gameRepository;
+
     @PostMapping("/create")
-    public String createGame(@RequestBody Map<String, String> requestBody) {
-        //String worldId = requestBody.get("worldId");
-        String worldId = "69079f300a402a2b69a147d1";
-        int winningPoints = Integer.parseInt(requestBody.get("winningPoints"));
-        System.out.println("winningPoints: " + winningPoints);
-        return gameService.createGame(worldId, winningPoints);
+public String createGame(@RequestBody Map<String, String> requestBody) {
+    String worldId = "69079f300a402a2b69a147d1";
+    
+    String wp = requestBody.get("winningPoints");
+    int winningPoints = 100; // default
+    if (wp != null) {
+        try {
+            winningPoints = Integer.parseInt(wp);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Invalid winningPoints: " + wp);
+        }
     }
+
+    String gameId = gameService.createGame(worldId, winningPoints);
+
+    String lobbyId = requestBody.get("lobbyId");
+    if (lobbyId == null || lobbyId.isEmpty()) {
+        throw new RuntimeException("LobbyId missing");
+    }
+
+    Lobby lobby = lobbyRepository.findLobbyById(lobbyId);
+    if (lobby == null) throw new RuntimeException("Lobby not found: " + lobbyId);
+
+    List<User> users = lobby.getUsers();
+    if (users == null || users.isEmpty()) throw new RuntimeException("Lobby has no users");
+
+    Game game = gameRepository.findGameById(gameId);
+    if (game == null) throw new RuntimeException("Game not found: " + gameId);
+
+    for (User user : users) {
+        game.addPlayerId(user.getId());
+    }
+    gameRepository.save(game);
+
+    // Broadcast to clients
+    Map<String, String> payload = new HashMap<>();
+    payload.put("gameId", gameId);
+    messagingTemplate.convertAndSend("/topic/lobby/" + lobbyId + "/gameCreated", payload);
+    System.out.println("Broadcasted gameCreated for lobby " + lobbyId);
+
+    return gameId;
+}
+
 
 
     @PostMapping("/territories")
@@ -78,7 +120,28 @@ public class GameController {
      */
     @PostMapping("/getInfo")
     public Map<String, Object> getGameInfo(@RequestBody Map<String, String> requestBody) {
-        String gameId = requestBody.get("gameId");
-        return gameService.getGameInfo(gameId);
+    String gameId = requestBody.get("gameId");
+    
+    Game game = gameRepository.findGameById(gameId);
+    if (game == null) {
+        throw new RuntimeException("Game not found for ID: " + gameId);
     }
+
+    Map<String, Object> info = new HashMap<>();
+    info.put("gameId", game.getId());
+    info.put("playerIds", game.getPlayerIds());
+    info.put("status", game.getStatus());
+    info.put("summary", game.getSummary());
+    info.put("winningPoints", game.getWinningPoints());
+    info.put("worldId", game.getWorldId());
+    info.put("turn", game.getTurn());
+
+    // Add territories
+    List<Map<String, Object>> territories = gameService.getTerritoriesByGameId(gameId);
+    info.put("territories", territories);
+
+    return info;
+}
+
+    
 }
