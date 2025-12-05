@@ -1,5 +1,7 @@
 package com.dominAItionBackend.controllers;
 
+import com.dominAItionBackend.repository.GameRepository;
+import com.dominAItionBackend.models.Game;
 import com.dominAItionBackend.service.AIService;
 import com.dominAItionBackend.service.GameService;
 import com.dominAItionBackend.service.WorldService;
@@ -23,6 +25,9 @@ public class AIController {
     @Autowired
     private WorldService worldService;
 
+    @Autowired
+    private GameRepository gameRepository;
+
     //main story endpoint (/api/ai/story)
 
     /**
@@ -39,7 +44,11 @@ public class AIController {
         String playerId = requestBody.get("playerId");
         String request = requestBody.get("request");
         int difficulty = Integer.parseInt(requestBody.get("difficulty"));
-        return gameService.handleStoryRequest(gameId, playerId, request, difficulty);
+        String response = gameService.handleStoryRequest(gameId, playerId, request, difficulty);
+        Game game = gameRepository.findGameById(gameId);
+        game.setTurn(game.getTurn() + 1);
+        gameRepository.save(game);
+        return response;
     }
 
     //World Defining Endpoint

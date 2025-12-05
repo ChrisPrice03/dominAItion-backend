@@ -28,6 +28,8 @@ public class Game {
     private String joinURL; // URL to join the game
     private String chatId; // chat associated with the game
     private String summary; // brief summary of the game
+    private int turn;
+    private String moveResult;
 
     // Default constructor with list initialization
     public Game() {
@@ -45,6 +47,8 @@ public class Game {
         this.joinCode = 0;
         this.joinURL = "";
         this.chatId = "";
+        this.turn = 0;
+        this.moveResult = "";
     }
 
     // Constructor for quick creation
@@ -97,4 +101,6 @@ public class Game {
     public void setChatId(String chatId) { this.chatId = chatId; }
     public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
+    public int getTurn() { return turn; }
+    public void setTurn(int turn) { this.turn = turn; }
 }
