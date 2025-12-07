@@ -31,6 +31,8 @@ public class Game {
     private int turn;
     private String storyboard;
     private List<Message> chat;
+    private List<Message> gameLog;
+    private String winnerId;
 
     // Default constructor with list initialization
     public Game() {
@@ -51,6 +53,8 @@ public class Game {
         this.turn = 0;
         this.storyboard = "";
         this.chat = new ArrayList<>();
+        this.gameLog = new ArrayList<>();
+        this.winnerId = "";
     }
 
     // Constructor for quick creation
@@ -112,5 +116,17 @@ public class Game {
     }
     public void setChat(List<Message> chat) {
         this.chat = chat;
+    }
+    public List<Message> getGameLog() {
+        return gameLog;
+    }
+    public void setGameLog(List<Message> gameLog) {
+        this.gameLog = gameLog;
+    }
+    public String getWinnerId() {
+        return winnerId;
+    }
+    public void setWinnerId(String winnerId) {
+        this.winnerId = winnerId;
     }
 }

@@ -124,6 +124,22 @@ public String createGame(@RequestBody Map<String, String> requestBody) {
         return gameService.startGame(gameId);
     }
 
+    @PostMapping("/win")
+    public String win(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        String winnerId = requestBody.get("winnerId");
+
+        Game game = gameRepository.findGameById(gameId);
+
+        game.setWinnerId(winnerId);
+
+        game.setStatus("done");
+        
+        gameRepository.save(game);
+        return gameId;
+
+    }
+
     @PostMapping("/message")
     public String sendMessage(@RequestBody Map<String, String> requestBody) {
         String gameId = requestBody.get("gameId");
@@ -194,6 +210,11 @@ for (String id : playerIds) {
     info.put("territories", territories);
 
     return info;
+}
+
+@GetMapping("/active")
+public List<Game> getActiveGames() {
+    return gameRepository.findAllByStatusNotDone();
 }
 
     
