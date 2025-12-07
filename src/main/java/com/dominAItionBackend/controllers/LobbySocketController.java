@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import com.dominAItionBackend.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -38,6 +39,9 @@ public class LobbySocketController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private GameService gameService;
 
     // Get a lobby by ID
     @GetMapping("/{id}")
@@ -92,15 +96,23 @@ public class LobbySocketController {
     public void userJoined(JoinLobby message) {
         String lobbyId = message.getLobbyId();
         String userId = message.getUserId();
+        String characterId = message.getCharacterId();
 
         Lobby lobby = lobbyRepository.findById(lobbyId)
                 .orElseThrow(() -> new RuntimeException("Lobby not found: " + lobbyId));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
 
-        lobby.addUser(user);
+        // 1) Add user + store character
+        lobby.addUserWithCharacter(user, characterId);
         lobbyRepository.save(lobby);
 
+        // 2) If game already exists, auto-add to that game
+        if (lobby.getGameId() != null && characterId != null && !characterId.isBlank()) {
+            gameService.addPlayerToGame(lobby.getGameId(), userId, characterId);
+        }
+
+        // 3) Broadcast updated lobby
         messagingTemplate.convertAndSend("/topic/lobby/" + lobby.getId(), lobby);
     }
 }

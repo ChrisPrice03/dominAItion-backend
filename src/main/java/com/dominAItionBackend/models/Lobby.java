@@ -6,7 +6,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Document(collection = "lobbies")
 public class Lobby {
@@ -23,6 +25,11 @@ public class Lobby {
 
     @Field("isPrivate") // store in MongoDB as "isPrivate"
     private boolean privateLobby;
+
+    private Map<String, String> userCharacterMap = new HashMap<>();
+
+    // Optionally store the gameId once created
+    private String gameId;
 
     // Default constructor
     public Lobby() {}
@@ -56,6 +63,16 @@ public class Lobby {
     public boolean isPrivateLobby() { return privateLobby; }
     public void setPrivateLobby(boolean privateLobby) { this.privateLobby = privateLobby; }
 
+    public String getGameId() { return gameId; }
+    public void setGameId(String gameId) { this.gameId = gameId; }
+
+    public Map<String, String> getUserCharacterMap() {
+        return userCharacterMap;
+    }
+    public void setUserCharacterMap(Map<String, String> userCharacterMap) {
+        this.userCharacterMap = userCharacterMap;
+    }
+
     // Add / remove user
     public void addUser(User user) {
         if (!users.contains(user)) users.add(user);
@@ -63,5 +80,16 @@ public class Lobby {
 
     public void removeUser(User user) {
         users.remove(user);
+    }
+
+    public void addUserWithCharacter(User user, String characterId) {
+        this.addUser(user); // your existing logic to add to users list
+        if (characterId != null && !characterId.isBlank()) {
+            userCharacterMap.put(user.getId(), characterId);
+        }
+    }
+
+    public String getCharacterIdForUser(String userId) {
+        return userCharacterMap.get(userId);
     }
 }

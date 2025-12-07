@@ -39,52 +39,68 @@ public class GameController {
 
     @Autowired
     private UserRepository userRepository;
-    
-    
+
+
 
     @PostMapping("/create")
-public String createGame(@RequestBody Map<String, String> requestBody) {
-    String worldId = "69079f300a402a2b69a147d1";
-    
-    String wp = requestBody.get("winningPoints");
-    int winningPoints = 100; // default
-    if (wp != null) {
-        try {
-            winningPoints = Integer.parseInt(wp);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Invalid winningPoints: " + wp);
+    public String createGame(@RequestBody Map<String, String> requestBody) {
+        String worldId = "69079f300a402a2b69a147d1";
+
+        String wp = requestBody.get("winningPoints");
+        int winningPoints = 100; // default
+        if (wp != null) {
+            try {
+                winningPoints = Integer.parseInt(wp);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("Invalid winningPoints: " + wp);
+            }
         }
+
+        // 1) Create the game
+        String gameId = gameService.createGame(worldId, winningPoints);
+
+        // 2) Fetch lobby
+        String lobbyId = requestBody.get("lobbyId");
+        if (lobbyId == null || lobbyId.isEmpty()) {
+            throw new RuntimeException("LobbyId missing");
+        }
+
+        Lobby lobby = lobbyRepository.findLobbyById(lobbyId);
+        if (lobby == null) throw new RuntimeException("Lobby not found: " + lobbyId);
+
+        List<User> users = lobby.getUsers();
+        if (users == null || users.isEmpty()) throw new RuntimeException("Lobby has no users");
+
+        // 3) (Optional but recommended) store gameId on the lobby
+        lobby.setGameId(gameId);
+        lobbyRepository.save(lobby);
+
+        // 4) Add all lobby users to the game using their chosen character
+        for (User user : users) {
+            String playerId = user.getId();
+
+            // look up the character they chose when they joined
+            String characterId = lobby.getUserCharacterMap().get(playerId);
+
+            if (characterId == null || characterId.isBlank()) {
+                // up to you: either skip, or throw, or use a default
+                System.out.println("No character selected for user " + playerId + ", skipping addPlayer");
+                continue;
+            }
+
+            // NEW: playerId + characterId
+            gameService.addPlayerToGame(gameId, playerId, characterId);
+        }
+
+        // 5) Broadcast to clients (same as before)
+        Map<String, String> payload = new HashMap<>();
+        payload.put("gameId", gameId);
+        messagingTemplate.convertAndSend("/topic/lobby/" + lobbyId + "/gameCreated", payload);
+        System.out.println("Broadcasted gameCreated for lobby " + lobbyId);
+
+        return gameId;
     }
 
-    String gameId = gameService.createGame(worldId, winningPoints);
-
-    String lobbyId = requestBody.get("lobbyId");
-    if (lobbyId == null || lobbyId.isEmpty()) {
-        throw new RuntimeException("LobbyId missing");
-    }
-
-    Lobby lobby = lobbyRepository.findLobbyById(lobbyId);
-    if (lobby == null) throw new RuntimeException("Lobby not found: " + lobbyId);
-
-    List<User> users = lobby.getUsers();
-    if (users == null || users.isEmpty()) throw new RuntimeException("Lobby has no users");
-
-    Game game = gameRepository.findGameById(gameId);
-    if (game == null) throw new RuntimeException("Game not found: " + gameId);
-
-    for (User user : users) {
-        game.addPlayerId(user.getId());
-    }
-    gameRepository.save(game);
-
-    // Broadcast to clients
-    Map<String, String> payload = new HashMap<>();
-    payload.put("gameId", gameId);
-    messagingTemplate.convertAndSend("/topic/lobby/" + lobbyId + "/gameCreated", payload);
-    System.out.println("Broadcasted gameCreated for lobby " + lobbyId);
-
-    return gameId;
-}
 
 
 
