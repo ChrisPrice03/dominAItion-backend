@@ -18,6 +18,9 @@ public class Message {
     private LocalDateTime time;    // when it was sent
 
     private boolean isRead;         // whether the message has been read
+    private String color;
+    private String senderName;
+    private int ignoreThis;
 
     public Message() {}
 
@@ -27,6 +30,13 @@ public class Message {
         this.contents = contents;
         this.time = LocalDateTime.now();
         this.isRead = false;
+    }
+
+    public Message(String senderName, String color, String contents, String chatId) {
+        this.senderName = senderName;
+        this.color = color;
+        this.contents = contents;
+        this.chatId = chatId; // Same as the Game ID
     }
 
     // Getters & Setters
@@ -53,4 +63,14 @@ public class Message {
     public void setRead(boolean isRead) {
         this.isRead = isRead;
     }
+
+    public String getColor() {
+        return color;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+
 }

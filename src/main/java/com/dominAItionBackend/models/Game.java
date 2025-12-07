@@ -29,7 +29,8 @@ public class Game {
     private String chatId; // chat associated with the game
     private String summary; // brief summary of the game
     private int turn;
-    private String moveResult;
+    private String storyboard;
+    private List<Message> chat;
 
     // Default constructor with list initialization
     public Game() {
@@ -48,7 +49,8 @@ public class Game {
         this.joinURL = "";
         this.chatId = "";
         this.turn = 0;
-        this.moveResult = "";
+        this.storyboard = "";
+        this.chat = new ArrayList<>();
     }
 
     // Constructor for quick creation
@@ -103,4 +105,12 @@ public class Game {
     public void setSummary(String summary) { this.summary = summary; }
     public int getTurn() { return turn; }
     public void setTurn(int turn) { this.turn = turn; }
+    public void setStoryboard(String storyboard) { this.storyboard = storyboard; }
+    public String getStoryboard() { return storyboard; }
+    public List<Message> getChat() {
+        return chat;
+    }
+    public void setChat(List<Message> chat) {
+        this.chat = chat;
+    }
 }

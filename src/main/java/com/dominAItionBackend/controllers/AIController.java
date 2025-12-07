@@ -6,6 +6,7 @@ import com.dominAItionBackend.service.AIService;
 import com.dominAItionBackend.service.GameService;
 import com.dominAItionBackend.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,10 @@ public class AIController {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
+
     //main story endpoint (/api/ai/story)
 
     /**
@@ -40,16 +45,28 @@ public class AIController {
      */
     @PostMapping("/story")
     public String promptRespond(@RequestBody Map<String, String> requestBody) {
-        String gameId = requestBody.get("gameId");
-        String playerId = requestBody.get("playerId");
-        String request = requestBody.get("request");
-        int difficulty = Integer.parseInt(requestBody.get("difficulty"));
-        String response = gameService.handleStoryRequest(gameId, playerId, request, difficulty);
-        Game game = gameRepository.findGameById(gameId);
-        game.setTurn(game.getTurn() + 1);
-        gameRepository.save(game);
-        return response;
-    }
+    String gameId = requestBody.get("gameId");
+    String playerId = requestBody.get("playerId");
+    String request = requestBody.get("request");
+    int difficulty = Integer.parseInt(requestBody.get("difficulty"));
+
+    // Main response logic
+    String response = gameService.handleStoryRequest(gameId, playerId, request, difficulty);
+
+    // Update game turn + storyboard
+    Game game = gameRepository.findGameById(gameId);
+    game.setTurn(game.getTurn() + 1);
+    game.setStoryboard(response);
+    gameRepository.save(game);
+
+    messagingTemplate.convertAndSend(
+        "/topic/game/" + gameId + "/refresh",
+        "reload"
+    );
+
+    return response;
+}
+
 
     //World Defining Endpoint
 
