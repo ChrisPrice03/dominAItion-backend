@@ -20,7 +20,8 @@ public class Message {
     private boolean isRead;         // whether the message has been read
     private String color;
     private String senderName;
-    private int ignoreThis;
+    private String storyResponse;
+
 
     public Message() {}
 
@@ -37,6 +38,14 @@ public class Message {
         this.color = color;
         this.contents = contents;
         this.chatId = chatId; // Same as the Game ID
+    }
+
+    public Message(String senderName, String color, String contents, String chatId, String storyResponse) {
+        this.senderName = senderName;
+        this.color = color;
+        this.contents = contents;
+        this.chatId = chatId; // Same as the Game ID
+        this.storyResponse = storyResponse;
     }
 
     // Getters & Setters

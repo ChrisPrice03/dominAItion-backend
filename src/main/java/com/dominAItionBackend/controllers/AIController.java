@@ -1,7 +1,11 @@
 package com.dominAItionBackend.controllers;
 
 import com.dominAItionBackend.repository.GameRepository;
+import com.dominAItionBackend.repository.UserRepository;
+import com.dominAItionBackend.controllers.UserController;
 import com.dominAItionBackend.models.Game;
+import com.dominAItionBackend.models.User;
+import com.dominAItionBackend.models.Message;
 import com.dominAItionBackend.service.AIService;
 import com.dominAItionBackend.service.GameService;
 import com.dominAItionBackend.service.WorldService;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/ai")
@@ -28,6 +33,12 @@ public class AIController {
 
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserController userController;
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
@@ -48,15 +59,26 @@ public class AIController {
     String gameId = requestBody.get("gameId");
     String playerId = requestBody.get("playerId");
     String request = requestBody.get("request");
+    String color = requestBody.get("color");
     int difficulty = Integer.parseInt(requestBody.get("difficulty"));
 
     // Main response logic
     String response = gameService.handleStoryRequest(gameId, playerId, request, difficulty);
 
+    Optional<User> user = userRepository.findById(playerId);
+
+    String username = user.map(User::getUsername).orElse(null);
+
+
     // Update game turn + storyboard
     Game game = gameRepository.findGameById(gameId);
     game.setTurn(game.getTurn() + 1);
     game.setStoryboard(response);
+
+    Message message = new Message(username, color, request, gameId, response);
+
+    game.getGameLog().add(message);
+
     gameRepository.save(game);
 
     messagingTemplate.convertAndSend(
