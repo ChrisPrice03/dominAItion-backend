@@ -22,67 +22,22 @@ public class CharacterController {
     @Autowired
     private CharacterRepository characterRepository;
 
-    /*
-    // ✅ Get all chats for a user
+
+    // Get all characters for a specific user
     @GetMapping("/{userId}")
-    public List<Chat> getUserChats(@PathVariable String userId) {
-        return chatRepository.findByMembersContaining(userId);
+    public List<Character> getUserChats(@PathVariable String userId) {
+        return characterRepository.findByCreatorID(userId);
     }
 
-    // ✅ Start new chat
-    @PostMapping("/start")
-    public Chat startChat(@RequestBody Map<String, Object> body) {
-        List<String> members = (List<String>) body.get("members");
-
-        // prevent duplicates
-        List<Chat> existing = chatRepository.findByMembersContaining(members.get(0));
-        for (Chat chat : existing) {
-            if (chat.getMembers().containsAll(members) && chat.getMembers().size() == members.size()) {
-                return chat;
-            }
+    @GetMapping("/delete/{characterId}")
+    public ResponseEntity<String> deleteCharacter(@PathVariable String characterId) {
+        try {
+            characterRepository.deleteById(characterId);
+            return ResponseEntity.ok("Character deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting character");
         }
-
-        Chat newChat = new Chat(members);
-        return chatRepository.save(newChat);
     }
-
-    // Send message
-    @PostMapping("/{chatId}/message")
-    public Message sendMessage(@PathVariable String chatId, @RequestBody Message msg) {
-        msg.setChatId(chatId);
-        msg.setTime(LocalDateTime.now());
-        msg.setRead(false); // new messages are unread by default
-        Message saved = messageRepository.save(msg);
-
-        Chat chat = chatRepository.findById(chatId).orElse(null);
-        if (chat != null) {
-            if (chat.getMessageIds() == null) chat.setMessageIds(new ArrayList<>());
-            chat.getMessageIds().add(saved.getId());
-            chatRepository.save(chat);
-        }
-
-        return saved;
-    }
-
-    // Get all messages in a chat
-    @GetMapping("/{chatId}/messages")
-    public List<Message> getMessages(@PathVariable String chatId) {
-        return messageRepository.findByChatId(chatId);
-    }
-
-    // ✅ Mark all messages as read for a specific user
-    @PutMapping("/{chatId}/mark-read/{userId}")
-    public ResponseEntity<?> markMessagesAsRead(@PathVariable String chatId, @PathVariable String userId) {
-        List<Message> msgs = messageRepository.findByChatId(chatId);
-
-        msgs.stream()
-            .filter(m -> !m.getSenderId().equals(userId) && !m.isRead())
-            .forEach(m -> m.setRead(true));
-
-        messageRepository.saveAll(msgs);
-        return ResponseEntity.ok("Messages marked as read");
-    }
-        */
 
 
 }

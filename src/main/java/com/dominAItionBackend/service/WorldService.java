@@ -88,11 +88,8 @@ public class WorldService {
                 territoryIds.add(savedTerritory.getId());
             });
 
-            System.out.println("ITS HERE");
-
             return territoryIds;
         } catch (Exception e) {
-            System.out.println("HERE IS THE ERROR:");
             e.printStackTrace();
             return List.of();
         }

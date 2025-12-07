@@ -9,29 +9,31 @@ public class Character {
     @Id
     private String id;
 
-    private String creatorID;
-    private String characterName;
-    private String characterBio;  
+    private String creatorID; // ID of the user created the character
+    private String characterName;  // the name of this character
+    private String characterBio;    // the bio/description of this character
 
-    private int wins;
-    private int losses;
-    private int gamesPlayed;
+    private int intelligence;   // intelligence stat
+    private int wisdom;       // wisdom stat
+    private int charisma;     // charisma stat
+    private int strength;     // strength stat
+    private int ingenuity;    // ingenuity stat
 
-    private boolean isPublic;
 
     public Character() {}
 
-    public Character(String creatorID, String characterName, String characterBio)
+    public Character(String creatorID, String characterName, String characterBio, int intelligence, int wisdom, int charisma, int strength, int ingenuity)
     {
         this();
         this.creatorID = creatorID;
         this.characterName = characterName;
         this.characterBio = characterBio;
         
-        this.isPublic = false;
-        this.wins = 0;
-        this.losses = 0;
-        this.gamesPlayed = 0;
+        this.intelligence = intelligence;
+        this.wisdom = wisdom;
+        this.charisma = charisma;
+        this.strength = strength;
+        this.ingenuity = ingenuity;
     }
 
     public String getId() {
@@ -66,35 +68,43 @@ public class Character {
         this.characterBio = characterBio;
     }
 
-    public int getWins() {
-        return wins;
+    public int getIntelligence() {
+        return intelligence;
     }
 
-    public void setWins(int wins) {
-        this.wins = wins;
+    public void setIntelligence(int intelligence) {
+        this.intelligence = intelligence;
     }
 
-    public int getLosses() {
-        return losses;
+    public int getWisdom() {
+        return wisdom;
     }
 
-    public void setLosses(int losses) {
-        this.losses = losses;
+    public void setWisdom(int wisdom) {
+        this.wisdom = wisdom;
     }
 
-    public int getGamesPlayed() {
-        return gamesPlayed;
+    public int getCharisma() {
+        return charisma;
     }
 
-    public void setGamesPlayed(int gamesPlayed) {
-        this.gamesPlayed = gamesPlayed;
+    public void setCharisma(int charisma) {
+        this.charisma = charisma;
     }
 
-    public boolean isPublic() {
-        return isPublic;
+    public int getStrength() {
+        return strength;
     }
 
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setStrength(int strength) {
+        this.strength = strength;
+    }
+
+    public int getIngenuity() {
+        return ingenuity;
+    }
+
+    public void setIngenuity(int ingenuity) {
+        this.ingenuity = ingenuity;
     }
 }

@@ -4,11 +4,13 @@ from world_definining_agent import WorldDefiningAgent
 from orchestration_agent import OrchestrationAgent
 from territory_agent import TerritoryAgent
 from summary_agent import SummaryAgent
+from character_defining_agent import CharacterDefiningAgent
 app = Flask(__name__)
 agent = OrchestrationAgent()
 worldAgent = WorldDefiningAgent()
 territoryAgent = TerritoryAgent()
 summaryAgent = SummaryAgent()
+characterAgent = CharacterDefiningAgent()
 
 #this file is used as a way to connect python to java
 @app.route('/orchestrate', methods=['POST'])
@@ -38,6 +40,13 @@ def summarize():
     data = request.json
     input_data = data.get("input", "")
     response = summaryAgent.summaryRequest(input_data)
+    return jsonify({"response": response})
+
+@app.route('/character', methods=['POST'])
+def character():
+    data = request.json
+    input_data = data.get("input", "")
+    response = characterAgent.character_defining_agent(input_data)
     return jsonify({"response": response})
 
 

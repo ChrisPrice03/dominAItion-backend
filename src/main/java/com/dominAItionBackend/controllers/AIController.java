@@ -3,6 +3,7 @@ package com.dominAItionBackend.controllers;
 import com.dominAItionBackend.repository.GameRepository;
 import com.dominAItionBackend.models.Game;
 import com.dominAItionBackend.service.AIService;
+import com.dominAItionBackend.service.CharacterService;
 import com.dominAItionBackend.service.GameService;
 import com.dominAItionBackend.service.WorldService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class AIController {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
+@Autowired
+    private CharacterService characterService;
 
     //main story endpoint (/api/ai/story)
 
@@ -88,7 +91,8 @@ public class AIController {
     //Character Defining Endpoint
     @PostMapping("/character")
     public String characterDefinition(@RequestBody Map<String, String> requestBody) {
+        String userId = requestBody.get("userId");
         String request = requestBody.get("request");
-        return aiService.callCharacterDefiningAgent(request);
+        return characterService.handleCharacterRequest(userId, request);
     }
 }
