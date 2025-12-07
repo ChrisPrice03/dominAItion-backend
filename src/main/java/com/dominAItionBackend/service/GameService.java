@@ -194,7 +194,7 @@ public class GameService {
         return territoryDetails;
     }
 
-    public boolean addPlayerToGame(String gameId, String playerId) {
+    public boolean addPlayerToGame(String gameId, String playerId, String characterId) {
         // Fetch the game by its ID
         Game game = gameRepository.findById(gameId).orElse(null);
         if (game == null) {
@@ -204,10 +204,20 @@ public class GameService {
         // Add the player to the game's player list if not already present
         if (!game.getPlayerIds().contains(playerId)) {
             game.getPlayerIds().add(playerId);
-            gameRepository.save(game);
         }
 
-        //Fetch the user by its ID
+        // --- NEW CODE: Assign characterId to playerId ---
+        if (game.getCharacterIds() == null) {
+            game.setCharacterIds(new HashMap<>());
+        }
+
+        // Only assign if not already assigned OR always overwrite depending on your logic
+        game.getCharacterIds().put(playerId, characterId);
+
+        // Save updated game
+        gameRepository.save(game);
+
+        // Fetch the user by its ID
         userRepository.findById(playerId).ifPresent(user -> {
             // Add the game to the user's saved games if not already present
             if (!user.getSavedGameIds().contains(gameId)) {
@@ -218,6 +228,7 @@ public class GameService {
 
         return true; // Player successfully added
     }
+
 
     public boolean startGame(String gameId) {
         // Fetch the game by its ID

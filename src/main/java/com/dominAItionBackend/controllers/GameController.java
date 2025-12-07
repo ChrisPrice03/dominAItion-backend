@@ -100,13 +100,15 @@ public String createGame(@RequestBody Map<String, String> requestBody) {
      * {
      *     "gameId": "68fa872b8636ca5f883a4a1a",
      *     "playerId": "player123"
+     *     "characterId": "char456"
      * }
      */
     @PostMapping("/addPlayer")
     public boolean addPlayerToGame(@RequestBody Map<String, String> requestBody) {
         String gameId = requestBody.get("gameId");
         String playerId = requestBody.get("playerId");
-        return gameService.addPlayerToGame(gameId, playerId);
+        String characterId = requestBody.get("characterId");
+        return gameService.addPlayerToGame(gameId, playerId, characterId);
     }
 
     /**
