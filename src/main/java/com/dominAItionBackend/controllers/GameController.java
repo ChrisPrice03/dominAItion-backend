@@ -2,10 +2,13 @@ package com.dominAItionBackend.controllers;
 
 import com.dominAItionBackend.repository.GameRepository;
 import com.dominAItionBackend.repository.LobbyRepository;
+import com.dominAItionBackend.repository.MessageRepository;
+import com.dominAItionBackend.repository.UserRepository;
 import com.dominAItionBackend.service.GameService;
 import com.dominAItionBackend.models.Lobby;
 import com.dominAItionBackend.models.User;
 import com.dominAItionBackend.models.Game;
+import com.dominAItionBackend.models.Message;
 import com.dominAItionBackend.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -30,6 +33,14 @@ public class GameController {
 
     @Autowired
     private GameRepository gameRepository;
+
+    @Autowired
+    private MessageRepository messageRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+    
+    
 
     @PostMapping("/create")
 public String createGame(@RequestBody Map<String, String> requestBody) {
@@ -111,6 +122,32 @@ public String createGame(@RequestBody Map<String, String> requestBody) {
         return gameService.startGame(gameId);
     }
 
+    @PostMapping("/message")
+    public String sendMessage(@RequestBody Map<String, String> requestBody) {
+        String gameId = requestBody.get("gameId");
+        String name = requestBody.get("name");
+        String color = requestBody.get("color");
+        String contents = requestBody.get("contents");
+
+        Message message = new Message(name, color, contents, gameId);
+        String messageId = message.getId();
+
+        Game game = gameRepository.findGameById(gameId);
+
+        messageRepository.save(message);
+
+        game.getChat().add(message);
+
+        gameRepository.save(game);
+
+        messagingTemplate.convertAndSend(
+            "/topic/game/" + gameId + "/refresh",
+            "reload"
+        );
+
+        return messageId;
+    }
+
     /**
      * Gets game information.
      * Example Request Body:
@@ -127,6 +164,15 @@ public String createGame(@RequestBody Map<String, String> requestBody) {
         throw new RuntimeException("Game not found for ID: " + gameId);
     }
 
+     // Suppose you have a Game object with playerIds
+List<String> playerIds = game.getPlayerIds();
+
+// Fetch all players from DB
+Map<String, String> playerNames = new HashMap<>();
+for (String id : playerIds) {
+    userRepository.findById(id).ifPresent(user -> playerNames.put(id, user.getUsername()));
+}
+
     Map<String, Object> info = new HashMap<>();
     info.put("gameId", game.getId());
     info.put("playerIds", game.getPlayerIds());
@@ -135,6 +181,11 @@ public String createGame(@RequestBody Map<String, String> requestBody) {
     info.put("winningPoints", game.getWinningPoints());
     info.put("worldId", game.getWorldId());
     info.put("turn", game.getTurn());
+    info.put("storyboard", game.getStoryboard());
+    info.put("playerPoints", game.getPlayerPoints());
+    info.put("chat", game.getChat());
+    info.put("playerNames", playerNames);
+
 
     // Add territories
     List<Map<String, Object>> territories = gameService.getTerritoriesByGameId(gameId);
