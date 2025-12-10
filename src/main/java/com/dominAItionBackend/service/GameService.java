@@ -2,6 +2,8 @@ package com.dominAItionBackend.service;
 
 import com.dominAItionBackend.models.Game;
 import com.dominAItionBackend.models.Territory;
+import com.dominAItionBackend.models.Character;
+import com.dominAItionBackend.repository.CharacterRepository;
 import com.dominAItionBackend.repository.GameRepository;
 import com.dominAItionBackend.repository.TerritoryRepository;
 import com.dominAItionBackend.repository.UserRepository;
@@ -31,6 +33,9 @@ public class GameService {
 
     @Autowired
     TerritoryRepository territoryRepository;
+
+    @Autowired
+    CharacterRepository characterRepository;
 
     public String handleStoryRequest(String gameId, String playerId, String request, int difficulty) {
         //pulling game state
@@ -66,6 +71,7 @@ public class GameService {
 
     public String extractRelevantGameState(Game game) {
         List<String> playerIds = game.getPlayerIds();
+        Map<String, String> characterIds = game.getCharacterIds();
         List<Map<String, Object>> territoryInfo = getTerritoriesByGameId(game.getId());
         String gameLog = game.getGame_log();
 
@@ -75,11 +81,27 @@ public class GameService {
         for (String playerId : playerIds) {
             userRepository.findById(playerId).ifPresent(user -> {
                 Map<String, String> playerInfo = new HashMap<>();
+
+                Character character = characterRepository.findById(characterIds.get(playerId)).orElse(null);
+
                 playerInfo.put("id", user.getId());
                 playerInfo.put("name", user.getUsername());
+                playerInfo.put("characterName", character != null ? character.getCharacterName() : "Unknown");
+                playerInfo.put("characterBio", character != null ? character.getCharacterBio() : "No bio available");
+                playerInfo.put("intelligence", character != null ? Integer.toString(character.getIntelligence()) : "0");
+                playerInfo.put("wisdom", character != null ? Integer.toString(character.getWisdom()) : "0");
+                playerInfo.put("charisma", character != null ? Integer.toString(character.getCharisma()) : "0");
+                playerInfo.put("strength", character != null ? Integer.toString(character.getStrength()) : "0");
+                playerInfo.put("ingenuity", character != null ? Integer.toString(character.getIngenuity()) : "0");
+
                 playerInfoList.add(playerInfo);
             });
         }
+
+        System.out.println("Extracted Game State:\n"
+                + "Players: " + playerInfoList.toString() + "\n"
+                + "Territories: " + territoryInfo.toString() + "\n"
+                + "Game Log: " + gameLog);
 
         return "Players: " + playerInfoList.toString() + "\n"
                 + "Territories: " + territoryInfo.toString() + "\n"
