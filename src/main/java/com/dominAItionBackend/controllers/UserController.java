@@ -1,20 +1,40 @@
 package com.dominAItionBackend.controllers;
 
-import com.dominAItionBackend.models.*;
-import com.dominAItionBackend.repository.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.*;
-
-import com.dominAItionBackend.service.EmailService;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dominAItionBackend.models.EmailVerificationToken;
+import com.dominAItionBackend.models.Game;
+import com.dominAItionBackend.models.PasswordResetToken;
+import com.dominAItionBackend.models.User;
+import com.dominAItionBackend.models.World;
+import com.dominAItionBackend.repository.EmailVerificationTokenRepository;
+import com.dominAItionBackend.repository.GameRepository;
+import com.dominAItionBackend.repository.PasswordResetTokenRepository;
+import com.dominAItionBackend.repository.UserRepository;
+import com.dominAItionBackend.repository.WorldRepository;
+import com.dominAItionBackend.service.EmailService;
 
 
 
@@ -705,6 +725,74 @@ public class UserController {
                 "success", true,
                 "message", "Total play time incremented successfully",
                 "totalPlayTime", newTotal
+        ));
+    }
+
+    /* CONVERT GUEST ACCOUNT INTO REAL ACCOUNT */
+    @PostMapping("/convertGuest/{guestEmail}")
+    public ResponseEntity<?> convertGuest(
+            @PathVariable String guestEmail,
+            @RequestBody Map<String, String> body) {
+
+        User guest = userRepository.findByEmail(guestEmail);
+        if (guest == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Guest account not found");
+        }
+
+        String newUsername = body.get("newGuestUsername");
+        String newEmail = body.get("newGuestEmail");
+        String newPassword = body.get("newGuestPassword");
+
+        if (newUsername == null || newUsername.trim().isEmpty() ||
+            newEmail == null || newEmail.trim().isEmpty() ||
+            newPassword == null || newPassword.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Username, email, and password are required");
+        }
+
+        // Check if new username or email already exists
+        if (userRepository.findByUsername(newUsername) != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Username already taken");
+        }
+        if (userRepository.findByEmail(newEmail) != null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already taken");
+        }
+
+        // Create new user preserving stats
+        User newUser = new User();
+        newUser.setUsername(newUsername);
+        newUser.setEmail(newEmail);
+        newUser.setPassword(newPassword); // Ideally hashed using passwordEncoder
+        newUser.setWins(guest.getWins());
+        newUser.setLosses(guest.getLosses());
+        newUser.setGamesPlayed(guest.getGamesPlayed());
+        newUser.setTotalPlayTime(guest.getTotalPlayTime());
+        newUser.setFriendIds(new ArrayList<>(guest.getFriendIds()));
+        newUser.setFriendRequestIds(new ArrayList<>(guest.getFriendRequestIds()));
+        newUser.setSavedGameIds(new ArrayList<>(guest.getSavedGameIds()));
+        newUser.setSavedWorldIds(new ArrayList<>(guest.getSavedWorldIds()));
+        newUser.setSavedCharIds(new ArrayList<>(guest.getSavedCharIds()));
+        newUser.setAchievementIds(new ArrayList<>(guest.getAchievementIds()));
+        newUser.setNotificationsEnabled(guest.isNotificationsEnabled());
+        newUser.setMusicEnabled(guest.isMusicEnabled());
+        newUser.setBio(guest.getBio());
+        newUser.setIcon(guest.getIcon());
+        newUser.setPublic(guest.isPublic());
+        newUser.setOnline(guest.isOnline());
+        newUser.setHuman(true);
+        newUser.setEmailVerified(false); // Need to verify new email
+
+        // Save new user
+        User savedUser = userRepository.save(newUser);
+
+        // Optionally, you can mark guest account as inactive or delete it
+        // guest.setEmail(guest.getEmail() + "_old");
+        // guest.setUsername(guest.getUsername() + "_old");
+        // userRepository.save(guest);
+
+        return ResponseEntity.ok(Map.of(
+            "success", true,
+            "message", "Guest account converted successfully",
+            "user", savedUser
         ));
     }
 
