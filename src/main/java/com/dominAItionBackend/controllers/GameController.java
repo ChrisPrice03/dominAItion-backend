@@ -151,9 +151,12 @@ public class GameController {
         String gameId = requestBody.get("gameId");
         String winnerId = requestBody.get("winnerId");
 
+        User user = userRepository.findById(gameId).get();
+        System.out.println(gameId);
+        System.out.println(winnerId);
         Game game = gameRepository.findGameById(gameId);
 
-        game.setWinnerId(winnerId);
+        game.setWinnerId(user.getUsername());
 
         game.setStatus("done");
         
