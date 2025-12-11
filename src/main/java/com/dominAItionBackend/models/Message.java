@@ -81,5 +81,12 @@ public class Message {
         return senderName;
     }
 
+    public String getStoryResponse() {
+        return storyResponse;
+    }
+    
+    public void setStoryResponse(String storyResponse) {
+        this.storyResponse = storyResponse;
+    }
 
 }

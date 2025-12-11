@@ -821,6 +821,18 @@ public class UserController {
         ));
     }
 
+    @PostMapping("/history")
+    public List<Game> getHistory(@RequestBody Map<String, String> requestBody) {
+        String userId = requestBody.get("userId");
+    
+        // Filter completed games where the user participated
+        return gameRepository.findAll().stream()
+                .filter(game -> "done".equals(game.getStatus()) && game.getPlayerIds().contains(userId))
+                .toList(); // Returns a List<Game>
+    }
+    
+    
+
 
 
 }
