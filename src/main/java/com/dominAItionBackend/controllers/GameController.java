@@ -1,22 +1,30 @@
 package com.dominAItionBackend.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dominAItionBackend.models.Game;
+import com.dominAItionBackend.models.Lobby;
+import com.dominAItionBackend.models.Message;
+import com.dominAItionBackend.models.User;
 import com.dominAItionBackend.repository.GameRepository;
 import com.dominAItionBackend.repository.LobbyRepository;
 import com.dominAItionBackend.repository.MessageRepository;
 import com.dominAItionBackend.repository.UserRepository;
 import com.dominAItionBackend.service.GameService;
-import com.dominAItionBackend.models.Lobby;
-import com.dominAItionBackend.models.User;
-import com.dominAItionBackend.models.Game;
-import com.dominAItionBackend.models.Message;
-import com.dominAItionBackend.service.GameService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/game")
@@ -40,6 +48,8 @@ public class GameController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
 
     @PostMapping("/create")
@@ -210,6 +220,7 @@ for (String id : playerIds) {
     Map<String, Object> info = new HashMap<>();
     info.put("gameId", game.getId());
     info.put("playerIds", game.getPlayerIds());
+    info.put("spectatorIds", game.getSpectatorIds());
     info.put("status", game.getStatus());
     info.put("summary", game.getSummary());
     info.put("winningPoints", game.getWinningPoints());
@@ -232,6 +243,67 @@ for (String id : playerIds) {
 public List<Game> getActiveGames() {
     return gameRepository.findAllByStatusNotDone();
 }
+
+@PostMapping("/addSpectator")
+public void addSpectator(@RequestBody Map<String, String> body) {
+    String gameId = body.get("gameId");
+    String userId = body.get("userId");
+
+    Game game = gameRepository.findGameById(gameId);
+    if (game == null) throw new RuntimeException("Game not found");
+
+    if (!game.getSpectatorIds().contains(userId)) {
+        game.getSpectatorIds().add(userId);
+        gameRepository.save(game);
+    }
+
+    simpMessagingTemplate.convertAndSend(
+        "/topic/game/" + gameId + "/spectators",
+        game.getSpectatorIds()
+    );
+}
+
+@PostMapping("/removeSpectator")
+public void removeSpectator(@RequestBody Map<String, String> body) {
+    String gameId = body.get("gameId");
+    String userId = body.get("userId");
+
+    Game game = gameRepository.findGameById(gameId);
+    if (game == null) throw new RuntimeException("Game not found");
+
+    game.getSpectatorIds().remove(userId);
+    gameRepository.save(game);
+
+    simpMessagingTemplate.convertAndSend(
+        "/topic/game/" + gameId + "/spectators",
+        game.getSpectatorIds()
+    );
+}
+
+@GetMapping("/spectators/names/{gameId}")
+public ResponseEntity<Map<String, String>> getSpectatorNames(@PathVariable String gameId) {
+    Game game = gameRepository.findGameById(gameId);
+    if (game == null) {
+        return ResponseEntity.notFound().build();
+    }
+
+    List<String> spectatorIds = new ArrayList<>(game.getSpectatorIds());
+    Map<String, String> result = new HashMap<>();
+
+    for (String id : spectatorIds) {
+        userRepository.findById(id).ifPresent(user -> result.put(id, user.getUsername()));
+    }
+
+    return ResponseEntity.ok(result);
+}
+
+@GetMapping("/username")
+public String getUsername(@RequestParam String userId) {
+    return userRepository.findById(userId)
+            .map(User::getUsername)
+            .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+}
+
 
     
 }
