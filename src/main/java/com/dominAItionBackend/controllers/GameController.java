@@ -48,10 +48,6 @@ public class GameController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-
-
     @PostMapping("/create")
     public String createGame(@RequestBody Map<String, String> requestBody) {
         String worldId = "69079f300a402a2b69a147d1";
@@ -256,11 +252,6 @@ public void addSpectator(@RequestBody Map<String, String> body) {
         game.getSpectatorIds().add(userId);
         gameRepository.save(game);
     }
-
-    simpMessagingTemplate.convertAndSend(
-        "/topic/game/" + gameId + "/spectators",
-        game.getSpectatorIds()
-    );
 }
 
 @PostMapping("/removeSpectator")
@@ -273,11 +264,6 @@ public void removeSpectator(@RequestBody Map<String, String> body) {
 
     game.getSpectatorIds().remove(userId);
     gameRepository.save(game);
-
-    simpMessagingTemplate.convertAndSend(
-        "/topic/game/" + gameId + "/spectators",
-        game.getSpectatorIds()
-    );
 }
 
 @GetMapping("/spectators/names/{gameId}")
