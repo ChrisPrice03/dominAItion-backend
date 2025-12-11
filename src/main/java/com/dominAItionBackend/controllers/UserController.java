@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,6 +67,8 @@ public class UserController {
     @Autowired
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable String id) {
@@ -91,7 +94,29 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Invalid credentials");
         }
+        broadcastLoginToFriends(user);
         return ResponseEntity.ok(user);
+    }
+
+    private void broadcastLoginToFriends(User user) {
+        if (user.getFriendIds() == null) return;
+
+        for (String friendId : user.getFriendIds()) {
+            userRepository.findById(friendId).ifPresent(friend -> {
+                boolean notificationsEnabled = friend.isNotificationsEnabled(); // get flag
+
+                // Send message to each friend's WebSocket channel
+                simpMessagingTemplate.convertAndSend(
+                    "/topic/user/" + friend.getId() + "/notifications",
+                    Map.of(
+                        "type", "FRIEND_ONLINE",
+                        "userId", user.getId(),
+                        "username", user.getUsername(),
+                        "notificationsEnabled", notificationsEnabled
+                    )
+                );
+            });
+        }
     }
 
     @PutMapping("/{id}")
