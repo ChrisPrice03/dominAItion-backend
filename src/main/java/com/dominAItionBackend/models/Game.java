@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 import java.util.*;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 @Document(collection = "games")
 public class Game {
@@ -33,6 +36,7 @@ public class Game {
     private List<Message> chat;
     private List<Message> gameLog;
     private String winnerId;
+    private String dateCreated;
 
     // Default constructor with list initialization
     public Game() {
@@ -55,6 +59,9 @@ public class Game {
         this.chat = new ArrayList<>();
         this.gameLog = new ArrayList<>();
         this.winnerId = "";
+        this.dateCreated = ZonedDateTime.now(ZoneId.of("America/New_York"))
+        .format(DateTimeFormatter.ISO_LOCAL_DATE);
+
     }
 
     // Constructor for quick creation
@@ -128,5 +135,11 @@ public class Game {
     }
     public void setWinnerId(String winnerId) {
         this.winnerId = winnerId;
+    }
+    public String getDateCreated() {
+        return dateCreated;
+    }
+    public void setDateCreated(String dateCreated) {
+        this.dateCreated = dateCreated;
     }
 }

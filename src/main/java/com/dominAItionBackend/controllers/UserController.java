@@ -830,6 +830,16 @@ public class UserController {
                 .filter(game -> "done".equals(game.getStatus()) && game.getPlayerIds().contains(userId))
                 .toList(); // Returns a List<Game>
     }
+
+    @PostMapping("/savedGames")
+    public List<Game> savedGames(@RequestBody Map<String, String> requestBody) {
+        String userId = requestBody.get("userId");
+    
+        // Filter completed games where the user participated
+        return gameRepository.findAll().stream()
+                .filter(game -> !"done".equals(game.getStatus()) && game.getPlayerIds().contains(userId))
+                .toList(); // Returns a List<Game>
+    }
     
     
 
