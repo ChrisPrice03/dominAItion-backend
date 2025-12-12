@@ -148,10 +148,13 @@ public class GameController {
 
     @PostMapping("/win")
     public String win(@RequestBody Map<String, String> requestBody) {
+        
         String gameId = requestBody.get("gameId");
         String winnerId = requestBody.get("winnerId");
+        System.out.println("GAMEID: " + gameId);
+        System.out.println("WINNERID" + winnerId);
 
-        User user = userRepository.findById(gameId).get();
+        User user = userRepository.findById(winnerId).get();
         System.out.println(gameId);
         System.out.println(winnerId);
         Game game = gameRepository.findGameById(gameId);
