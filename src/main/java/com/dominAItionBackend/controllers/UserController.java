@@ -830,8 +830,14 @@ public class UserController {
                 .filter(game -> "done".equals(game.getStatus()) && game.getPlayerIds().contains(userId))
                 .toList(); // Returns a List<Game>
     }
-    
-    
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<User>> getLeaderboardByWins() {
+        List<User> users = userRepository.findAll();
+        users.sort((u1, u2) -> Integer.compare(u2.getWins(), u1.getWins())); // Sort in descending order of wins
+        return ResponseEntity.ok(users.stream().limit(10).toList()); // Get top 10
+    }
+
 
 
 
